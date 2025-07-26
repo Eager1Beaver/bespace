@@ -11,7 +11,7 @@ This project centers on exploring the low-dimensional communication subspace sha
 This approach will be adapted here for sleep-related brain–eye dynamics. The computation and data requirements are modest, and we plan to work with a small subset of EDFs (30 participants).
 
 ### Project Data
-The raw data were obtained from the [National Sleep Research Resource](https://sleepdata.org/) database. The data obtained originates from the Center of Biomedical Research Excellence (COBRE) dataset in NifTI format and represents structural MR images. In the framework of the present study, the data was sampled to give a balanced representation of age and gender distributions in the dataset, prioritizing age distribution, which has been shown to affect model performance. Overall, the project includes data from 62 individuals, 30 with schizophrenia and 32 healthy controls.
+The raw data were obtained from the [National Sleep Research Resource](https://sleepdata.org/) database.
 
 APPLES dataset from the National Sleep Research Resource
 
