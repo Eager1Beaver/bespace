@@ -1,2 +1,6 @@
 /bespace
-/data
+/data/apples
+/data/del
+/data/static_cca/*_downsampled.csv
+/data/static_cca/all_downsampled_projections.csv
+/data/time_resolved_cca/*_timeseries.csv
