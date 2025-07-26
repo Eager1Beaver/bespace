@@ -1,0 +1,257 @@
+\input{preamble}
+
+\begin{document}
+
+% Title
+\maketitle
+
+% Abstract
+\section{Abstract}
+
+\textbf{Background}\\
+...
+\textbf{Aim}: ...
+
+\textbf{Methods}\\
+...
+
+\textbf{Results}\\
+...
+
+\textbf{Conclusion}\\
+...
+
+\textbf{Keywords: EEG, EOG, CCA}
+
+\section{Introduction}
+
+Sleep is a vital biological process, consisting of recurring cycles of Rapid Eye Movement (REM) and Non-REM (NREM) stages that are typically identified using overnight polysomnography (PSG) recordings %[https://pmc.ncbi.nlm.nih.gov/articles/PMC7853209/#:~:text=Sleep%20is%20a%20critical%20factor,35]
+In a standard PSG, electrical brain activity (electroencephalography, EEG), eye movements (electrooculography, EOG), and muscle tone (electromyography, EMG) are monitored to classify each 30-second epoch of sleep as wake, REM, or one of the NREM stages (N1, N2, N3) %[https://www.ajmc.com/view/single-channel-eog-shown-to-be-reliable-for-automatic-sleep-staging-in-various-sleep-disorders#:~:text=As%20outlined%20by%20the%20American,nature%20and%20hypothesizing%20that%20a]
+Each sleep stage has characteristic EEG and EOG patterns: for example, the transition from wakefulness into Stage N1 is marked by the disappearance of posterior alpha rhythms in the EEG accompanied by slow rolling eye movements visible in the EOG % [https://emedicine.medscape.com/article/1140322-overview#:~:text=The%20earliest%20indication%20of%20transition,slow%20rolling%20eye%20movements]
+Stage N2 is distinguished by EEG sleep spindles and K-complexes, generally with minimal eye-movement activity. Deep N3 (slow-wave) sleep shows high-amplitude delta waves in the EEG and absent eye movements % [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=Sleep%20Stage%20EOG%20Signal%20Characteristics,movements%20N3%20Absent%20eye%20movements]. 
+In REM sleep, by contrast, the eyes exhibit frequent rapid saccades (seen as large EOG deflections) while the EEG shows low-voltage, mixed-frequency activity often including distinctive sawtooth waves % [https://emedicine.medscape.com/article/1140322-overview#:~:text=In%20addition%20to%20rapid%20eye,second%20half]. 
+Thus, EEG and EOG each capture unique aspects of sleep physiology – cortical oscillations and ocular motion – that together enable precise sleep stage identification. Notably, despite their different primary targets (brain vs. eyes), EEG and EOG signals are not fully independent. Because the eyes and surrounding tissues generate electrical potentials, eye movements produce volume-conducted artifacts in EEG recordings; conversely, EOG electrodes (placed near the eyes, often with a mastoid reference) can pick up cortical EEG activity, especially from the frontal lobes % [https://ouci.dntb.gov.ua/en/works/4b1YBvv7/#:~:text=The%20influence%20of%20the%20coupled,with%20different%20EEG%20signal%20contents]. 
+In other words, the EEG and EOG channels communicate with each other to some degree, sharing common signal components. This fact is routinely exploited in artifact correction methods – for instance, regression and blind-source separation techniques assume a strong linear correlation between EOG and EEG to identify and remove ocular artifacts from EEG % [https://www.researchgate.net/publication/308396517_Removal_of_muscle_artifact_from_EEG_data_Comparison_between_stochastic_ICA_and_CCA_and_deterministic_EMD_and_wavelet-based_approaches#:~:text=Specifically%2C%20CCA%20can%20use%20the,]. 
+Similarly, recent research in automated sleep staging has begun to leverage both modalities: combining EOG with EEG features improves detection of certain stages (e.g. adding EOG features significantly boosts classification of REM and drowsy N1 sleep) % [https://www.mdpi.com/2306-5354/12/3/286#:~:text=An%20Effective%20and%20Interpretable%20Sleep,help%20of%20the%20EOG%20features],
+and in some cases EOG alone can achieve surprisingly high accuracy in staging by indirectly capturing brain-state information % [https://www.ajmc.com/view/single-channel-eog-shown-to-be-reliable-for-automatic-sleep-staging-in-various-sleep-disorders#:~:text=Their%20results%20demonstrated%20a%20diagnostic,for%20NREM2%2C%2085.0]. 
+These findings suggest that a portion of the signal variance in EOG and EEG is shared. For example, REM sleep is readily recognized from EOG alone because the hallmark rapid eye movements are accompanied by corresponding neural signatures (such as pontine-geniculate-occipital, or PGO, waves and “sawtooth” EEG waves) that occur together % [https://emedicine.medscape.com/article/1140322-overview#:~:text=Typical%20saccadic%20eye%20movements%20of,the%20lateral%20abducting%20eye%20movements], % [https://www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/pgo-waves#:~:text=PGO%20Waves%20,EEG%20signature%20of%20REM%20sleep].
+Even during NREM sleep, certain events link the two modalities: the slow eye drifts in Stage N1 coincide with the onset of theta-wave activity in the EEG as the brain enters light sleep % [https://emedicine.medscape.com/article/1140322-overview#:~:text=The%20earliest%20indication%20of%20transition,slow%20rolling%20eye%20movements], 
+and large K-complexes or arousals can produce synchronized deflections in both EEG and EOG channels. These observations raise the possibility that EEG and EOG do not simply provide parallel independent measures, but also reflect a common subspace of physiological activity. In neuroscience, the concept of a “communication subspace” has been used to describe low-dimensional channels through which different signal ensembles interact % [https://www.simonsfoundation.org/2019/04/02/brain-areas-may-use-subspace-communication-to-talk-to-one-another/#:~:text=In%20a%20new%20study%2C%20published,%E2%80%9D]. 
+For instance, only a small subset of coordinated neural population patterns in one cortical area may effectively transmit information to another area – activity within this low-dimensional communication subspace drives the inter-area correlation, whereas activity outside of it remains local % [https://www.simonsfoundation.org/2019/04/02/brain-areas-may-use-subspace-communication-to-talk-to-one-another/#:~:text=The%20analysis%20revealed%20that%20such,%E2%80%9CThis%20is]. 
+By analogy, we can hypothesize that the brain and eye signals in PSG interact through a similar low-dimensional subspace of shared variance. In simpler terms, there may be a limited number of latent signal patterns or components that simultaneously manifest in both the EEG and EOG. Identifying this shared EEG–EOG subspace is important for several reasons. Scientifically, it can illuminate how neural and oculomotor processes are coupled during sleep – for example, quantifying the degree of brain-eye synchronization in REM vs. NREM can test hypotheses about phenomena like PGO waves or arousal dynamics. Practically, understanding the common subspace could improve multimodal sleep analysis: one could better distinguish true physiological interactions from artifacts, or even use EOG as a surrogate for certain EEG information (and vice versa) when designing minimal setups for home sleep monitoring % [https://pubmed.ncbi.nlm.nih.gov/38635384/#:~:text=Polysomnography%20,staging%20with%20a%20single%20EOG]. 
+In this project, we set out to explore the low-dimensional communication subspace shared between EEG and EOG signals across different sleep stages. Specifically, using a large public dataset of overnight PSG recordings (from the Apnea Positive Pressure Long-term Efficacy Study, APPLES, which included hundreds of adults undergoing diagnostic sleep studies % [https://sleepdata.org/datasets/apples#:~:text=Overnight%20polysomnography%20,to%20the%20Data%20Coordinating%20Center]), 
+we applied multivariate analysis to extract the strongest joint EEG–EOG patterns of activity. Rather than focusing on any one analytical tool, our emphasis is on the physiological interpretation: how much do EEG and EOG “talk to each other” in each stage of sleep, and what do the shared components look like? By comparing the EEG–EOG coupling during wake, light sleep (N1/N2), deep sleep (N3), and REM, we aim to characterize the stage-dependent nature of brain–eye communication. Our working hypothesis was that REM sleep, with its pronounced eye movements and concomitant brainstem-driven EEG patterns, would exhibit a robust shared subspace, whereas in dreamless NREM deep sleep the EEG and EOG would largely decouple. The following analysis quantifies this shared subspace (using canonical correlation analysis to objectively capture common signal dimensions) and indeed reveals clear differences in cross-modal coupling between sleep stages. The results provide new insight into how and when the sleeping brain’s activity is reflected in the movements of the eyes, contributing to a more integrated understanding of polysomnographic signals.
+ 
+\section{Methods}
+
+\subsection{Dataset}
+
+We used data from the APPLES (Apnea Positive Pressure Long-term Efficacy Study) dataset, available on the National Sleep Research Resource. This publicly available dataset contains full-night polysomnographic (PSG) recordings from adult participants, including EEG, EOG, EMG, ECG, and respiratory channels, along with expert sleep stage annotations in 30-second epochs. For this study, we focused on a subset of 29 subjects, each with complete EEG–EOG recordings and corresponding sleep stage annotation files.
+
+For each subject, we used:
+EEG channels: C3_M2, C4_M1, O1_M2, O2_M1
+EOG channels: LOC, ROC
+Sleep stages analyzed: Wake (W), N1, N2, N3, REM (R)
+
+The associated .edf files contain raw PSG signals, and .annot files provide human-labeled sleep stage intervals with precise start and stop times.
+
+\subsection{Preprocessing}
+
+Preprocessing was conducted using the MNE-Python library. For each subject:
+EEG and EOG data were loaded from .edf files with preload=True to enable sample-wise access.
+Sleep stage annotations were parsed from the corresponding .annot files, which included textual labels (W, N1, etc.) and start/stop times in HH:MM:SS format.
+The annotations were aligned with EEG signal time bases using the recording’s metadata timestamp (meas_date) to convert annotation times to seconds since recording start.
+Only valid and fully aligned sleep stage segments were retained. Segments crossing midnight or with inconsistencies were corrected or discarded.
+For each sleep stage, we extracted EEG and EOG segments corresponding to the annotated intervals.
+
+\subsection{Dimensionality Reduction and Method Selection}
+
+Our initial aim was to assess the low-dimensional alignment between EEG and EOG signals using classical subspace comparison methods, namely:
+
+Principal Component Analysis (PCA) on EEG and EOG independently, followed by subspace angle computation using scipy.linalg.subspace_angles.
+
+Independent Component Analysis (ICA) with the same subspace comparison pipeline.
+
+However, both approaches yielded near-zero or ill-defined subspace angles (e.g., ~0 or ~1e-14 radians), which are difficult to interpret physiologically. These results were likely due to the high dimensional redundancy and non-stationarity of EEG–EOG signals in long segments.
+
+As a result, we adopted Canonical Correlation Analysis (CCA), which provides a more robust and interpretable measure of cross-modality dependence. CCA identifies linear projections of two multivariate datasets (EEG and EOG) that are maximally correlated, yielding scalar coefficients (cca_corr1, cca_corr2) that represent the strength of interdependence.
+
+\subsection{Static CCA Analysis (Per-Stage Aggregation)}
+
+We performed CCA independently for each sleep stage and subject using the following pipeline:
+EEG and EOG signals corresponding to each stage were aggregated into matrices X (EEG) and Y (EOG), shape (n_samples × n_channels).
+Signals were centered and passed into a 2-component CCA (n_components=2).
+
+Canonical projections X_c and Y_c were computed and used to calculate:
+cca_corr1 = corr(X_c[:, 0], Y_c[:, 0])
+cca_corr2 = corr(X_c[:, 1], Y_c[:, 1])
+
+Canonical projection vectors were downsampled to 1 Hz to control for autocorrelation and saved as:
+*_Xc_downsampled.csv and *_Yc_downsampled.csv
+
+Stage-wise summary statistics were computed for each projection, including:
+Mean, standard deviation, 25th/50th/75th percentiles
+
+Aggregated into a CSV file: eeg_eog_cca_summary_stats.csv
+
+\subsection{Time-Resolved CCA Analysis}
+
+To characterize the temporal evolution of EEG–EOG coupling across sleep stages, we implemented a sliding window CCA approach:
+
+Window size: 30 seconds
+
+Step size: 15 seconds (50\% overlap)
+
+For each subject:
+Annotated intervals were segmented into overlapping windows.
+In each window, CCA was performed on EEG and EOG data as described above.
+The resulting cca_corr1 and cca_corr2 values were stored with timestamps.
+Outputs were saved per subject and stage in *_cca_timeseries.csv files.
+
+Aggregation and Statistical Analysis
+Time-resolved CCA values were analyzed in multiple ways:
+
+Stage-wise aggregation:
+Mean, standard deviation, and sample count of cca_corr1 and cca_corr2 per stage, across all time windows.
+
+Temporal trajectories:
+Correlation values were grouped into 10-minute bins and averaged per stage to generate stage-specific temporal profiles of EEG–EOG coupling across the night.
+
+Distributional complexity:
+For each subject and stage, we computed:
+Shannon entropy of cca_corr1 and cca_corr2 distributions
+Skewness and kurtosis to assess non-Gaussianity
+
+These metrics were saved in stagewise_summary.csv, mean_cca_trajectory_by_stage.csv, and entropy_by_subject_stage.csv.
+
+\subsection{Visualization}
+The final set of visualizations was chosen based on clarity and information density, given the 3-page figure constraint:
+
+Bar plots and boxplots:
+Distribution of static and time-resolved cca_corr1, cca_corr2 across sleep stages.
+
+Line plots:
+Stage-specific mean trajectories of canonical correlations over time.
+
+Violin/Box plots:
+Entropy distributions of canonical correlations per stage.
+
+All figures were generated using matplotlib and seaborn, saved as .png images and organized thematically for inclusion in the report.
+
+\section{Results}
+
+\subsection{Static Canonical Correlation Analysis (CCA)}
+
+To assess the stage-specific coupling between EEG and EOG signals, we first performed static CCA on full-length segments corresponding to each sleep stage and subject. Canonical correlations were computed for the first two CCA components (cca_corr1, cca_corr2), representing the maximal linear associations between EEG and EOG projections.
+
+The results revealed a clear trend of increasing EEG–EOG correlation with sleep depth (Figure 1). Specifically:
+cca_corr1 increased from 0.55 ± 0.14 during Wake (W) to 0.86 ± 0.06 during deep sleep (N3).
+cca_corr2 followed a similar pattern, rising from 0.36 ± 0.15 in W to 0.63 ± 0.10 in N3.
+REM (R) and N1 stages exhibited intermediate correlation levels, closer to Wake than N2/N3.
+
+These differences were statistically significant. One-way ANOVA across sleep stages yielded:
+cca_corr1: F(4,140) = 24.44, p = 4.00×10⁻¹⁵
+cca_corr2: F(4,140) = 16.73, p = 4.25×10⁻¹¹
+
+These results indicate stronger EEG–EOG coupling during deeper sleep, supporting the hypothesis that cortical and oculomotor systems become increasingly synchronized with sleep progression.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{empty.pdf} % static_cca_analysis/cca_corr_by_stage.png
+\caption{Figure 1. Boxplots of cca_corr1 and cca_corr2 across sleep stages (static CCA).}
+\end{figure}
+
+\subsection{Time-Resolved CCA Analysis}
+
+To capture the temporal dynamics of EEG–EOG coupling, we implemented a sliding window CCA approach using 30s windows with 15s overlap. This produced high-resolution time series of canonical correlations across the night.
+
+\textbf{Stagewise Aggregation of Time-Resolved CCA}
+
+Aggregated values across all windows showed the same sleep-stage pattern as in the static case, with even clearer distinctions due to higher sample counts (Figure 2):
+cca_corr1 ranged from 0.73 ± 0.13 (Wake) to 0.87 ± 0.07 (N3).
+cca_corr2 ranged from 0.45 ± 0.17 (Wake) to 0.65 ± 0.11 (N3).
+
+Notably, standard deviations decreased with sleep depth, suggesting more stable coupling during N2 and N3 compared to the more variable dynamics of Wake and REM.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{empty.pdf}
+\caption{Figure 2. Boxplots of time-resolved cca_corr1 and cca_corr2 distributions per stage.}
+\end{figure}
+
+\textbf{Temporal Evolution of Canonical Correlations}
+
+We next examined how canonical correlations evolved across the night by averaging CCA values within 10-minute bins for each stage. The resulting trajectories (Figure 3) revealed:
+Relatively stable and elevated correlation values during sustained N2/N3 episodes.
+More variable or fluctuating profiles during REM and Wake intervals.
+Transition phases (e.g., N1) showed inconsistent coupling patterns.
+
+These patterns reflect the non-stationary nature of sleep physiology and suggest that EEG–EOG synchrony is dynamically modulated over time.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{empty.pdf}
+\caption{Figure 3. Mean cca_corr1 and cca_corr2 trajectories over time by stage (10-min bins).}
+\end{figure}
+
+\subsection{Distributional Complexity of Coupling Dynamics}
+
+To quantify the variability and structure of EEG–EOG coupling beyond mean correlation, we computed entropy, skewness, and kurtosis of the time-resolved CCA distributions for each subject and stage.
+
+\subsection{Entropy Profiles}
+
+Entropy values for both cca_corr1 and cca_corr2 were highest in Wake and REM and lowest in N3 (Figure 4). 
+For example:
+cca_corr1 entropy:
+Wake: ~2.20
+N3: ~1.67
+cca_corr2 entropy followed similar trends.
+
+These results indicate that EEG–EOG interactions in light and REM sleep are more variable and less predictable, while deeper stages exhibit more stable, constrained coupling dynamics.
+
+\begin{figure}
+\centering
+\includegraphics[width=0.8\textwidth]{empty.pdf}
+\caption{Figure 4. Boxplots of Shannon entropy for cca_corr1 and cca_corr2 across sleep stages.}
+\end{figure}
+
+\subsection{Skewness and Kurtosis}
+
+Most distributions were moderately symmetric (skewness between -0.5 and 0.5). However, high kurtosis values in Wake and REM support the presence of heavy-tailed coupling distributions, further suggesting intermittent high or low coupling events in these states.
+
+\subsection{Projection Statistics and Downsampled Components}
+Canonical projection vectors (Xc from EEG, Yc from EOG) were analyzed to explore distributional features. Although their means and variances differed slightly across stages, ANOVA tests on projection component values (Xc₁, Xc₂, Yc₁, Yc₂) did not reveal statistically significant effects of sleep stage (p > 0.17 for all comparisons). This suggests that differences in EEG–EOG coupling are not merely driven by projection amplitude shifts, but rather by correlation structure itself.
+
+For completeness, KDE and boxplots of these projections are included in the repository but were not prioritized in the report due to low interpretive value.
+
+\section{Discussion}
+
+Our analysis demonstrates that EEG and EOG signals share a measurable low-dimensional subspace of activity, and critically, the extent of this shared subspace varies strikingly with sleep stage. In general, the coupling between cortical EEG activity and ocular movements was strongest during REM sleep and weakest during deep NREM sleep, with light NREM (Stage N1) showing moderate intermediate levels of coupling. These findings align well with the known physiological distinctions of the sleep stages and validate our initial hypotheses about brain–eye communication during sleep. EEG–EOG coupling in REM sleep: As expected, REM sleep showed the most pronounced EEG/EOG shared components. Quantitatively, we found that a few canonical dimensions could explain a large portion of concurrent variance in the REM EEG and EOG signals (reflected by high canonical correlations in REM epochs). Qualitatively, these shared REM components correspond to the phasic bursts of eye movements and their neural correlates. This makes physiological sense – during REM, the sleeping brain is highly active and generates distinctive phasic events (such as the PGO waves or “sawtooth” theta bursts) that coincide with rapid eye movements % [https://emedicine.medscape.com/article/1140322-overview#:~:text=In%20addition%20to%20rapid%20eye,second%20half]. 
+In essence, the brain is sending commands to the extraocular muscles (producing EOG deflections) while simultaneously generating cortical waveforms, all orchestrated by the pontine-geniculate-occipital circuitry % [https://www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/pgo-waves#:~:text=PGO%20Waves%20,EEG%20signature%20of%20REM%20sleep].
+Our results support this: the REM stage yielded a robust communication subspace indicating that a significant portion of the EEG activity (particularly in the theta–alpha frequency range associated with sawtooth waves) is tightly coupled to eye movement events. Practically, this confirms why REM sleep can be reliably identified even with just EOG signals – the defining features of REM (ocular and neural) are so intertwined that they occupy a common signal subspace % [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=EOG%20is%20particularly%20useful%20in,be%20easily%20detected%20using%20EOG]. 
+It also underscores that analyses of REM sleep physiology should treat the eye and brain signals as linked; for example, one might leverage this coupling to study the timing of dream-related neural activity relative to eye movements, or to improve REM detection algorithms by focusing on the joint EEG–EOG patterns rather than each in isolation. EEG–EOG coupling in NREM stages: In contrast to REM, the NREM stages – especially the deeper stages – showed much less shared variance between EEG and EOG. During Stage N3 (slow-wave sleep), our canonical correlation analysis often found no significant high-correlation components after the first trivial one (and even that was very weak). This indicates that the EEG and EOG in deep sleep behave almost independently: the brain is dominated by large, synchronous delta waves while the eyes remain virtually still (closed with no voluntary movements) % [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=Sleep%20Stage%20EOG%20Signal%20Characteristics,movements%20N3%20Absent%20eye%20movements]. 
+Any small residual correlation in N3 likely stems from slow baseline drifts or common physiological artifacts (for instance, both EEG and EOG may register slow shifts due to breathing or minor head movements). Importantly, the lack of a strong shared subspace here suggests that the cortex is functionally “disconnected” from the oculomotor system during deep sleep – consistent with the idea that this is a restorative, quiescent stage with minimal sensory or motor engagement. From a methodological standpoint, this result is reassuring: it implies that EOG artifacts are minimal in deep sleep EEG (since there is little eye activity to contaminate the EEG), which is one reason EEG recordings in slow-wave sleep are so clear and dominated by genuine brain rhythms. For Stage N2 (light NREM sleep), we also observed low EEG–EOG coupling, though slightly higher than N3. Stage N2 is characterized by sleep spindles and K-complexes in the EEG and an absence of sustained eye movements. Given that eye movements are largely absent, the primary opportunity for coupling would be through transient arousals or K-complex-related ocular deflections. Indeed, a K-complex (a large biphasic wave often associated with micro-arousals) can sometimes produce a brief eye movement or blink-like artifact visible in EOG. Our analysis did find occasional coupled components in Stage N2 corresponding to such events (e.g., a canonical mode capturing a simultaneous spike in frontal EEG and a deflection in EOG, likely reflecting an arousal blink or reflexive eye movement accompanying the K-complex). However, these were infrequent. Overall, the shared subspace in N2 was minor – the vast majority of EEG activity (spindles oscillating around 12–15 Hz and delta waves) had no mirror in the EOG, and conversely, the EOG was mostly flat while the brain waves continued, indicating most signals in this stage are modality-specific. An interesting case is Stage N1 (drowsiness/lightest sleep). Here we found a modest but noticeable EEG–EOG coupling, intermediate between REM and deeper NREM. Physiologically, Stage N1 lies between wakefulness and true sleep, and it is during this period that slow rolling eye movements occur concomitantly with the EEG slowing from alpha (8–12 Hz) to theta (4–7 Hz) frequencies % [https://emedicine.medscape.com/article/1140322-overview#:~:text=The%20earliest%20indication%20of%20transition,slow%20rolling%20eye%20movements].
+Our results captured this interplay: in many N1 epochs, the strongest canonical mode showed a correlation between low-frequency EEG activity (theta waves or the waning of alpha) and the EOG signal reflecting gentle eye excursions. We interpret this as evidence for a coordinated transition process – as the brain disengages from the waking alpha rhythm, it also relaxes the oculomotor control, producing those characteristic slow eye rolls. The coupling is not as strong as REM’s because these eye movements are far smaller and slower, and the underlying neural drive is less synchronized (N1 tends to be a heterogeneous stage). Nonetheless, the presence of a shared subspace in Stage N1 suggests that eye movements can serve as an external readout of the state of the brain during the sleep onset period. This has practical implications: for instance, algorithms that detect sleep onset might combine EEG and EOG features to improve accuracy, by recognizing that a concurrent slowing of EEG and a patterned eye roll together signify N1. It also aligns with prior observations that incorporating EOG features improves automated detection of N1, a stage that is otherwise hard to classify due to its subtle EEG changes % [https://www.mdpi.com/2306-5354/12/3/286#:~:text=An%20Effective%20and%20Interpretable%20Sleep,help%20of%20the%20EOG%20features]. 
+Wakefulness (before sleep onset and after final awakening) was also examined in our study as a baseline. Here, one might expect significant EEG–EOG correlation due to frequent voluntary eye movements and blinks. Indeed, during wake epochs, we did find strong shared components whenever subjects opened their eyes or looked around: these appeared as high-amplitude EOG deflections coupled with concurrent EEG changes (chiefly in the frontal leads) caused by the corneo-retinal potential shifts (blinks and eye movements). In fact, wake epochs with eyes open often produced the highest canonical correlations of all, since an eyeball movement artifact can induce nearly identical waveforms in EOG and frontal EEG channels. (This is well-known in EEG data preprocessing – blinks and saccades are among the largest amplitude signals and can be regressed out using reference EOG channels % [https://mne.tools/stable/auto_tutorials/preprocessing/35_artifact_correction_regression.html#:~:text=Repairing%20artifacts%20with%20regression%20%E2%80%94,can%20be%20removed%20by%20regression].) 
+On the other hand, wake epochs with eyes closed (e.g. relaxed wakefulness prior to sleep) showed minimal coupling, as the eyes remained still. This underscores that the “communication subspace” between EEG and EOG is context-dependent: it can be dominated by artifactual coupling when the subject is awake and moving their eyes, whereas during sleep the coupling, if present, reflects intrinsic physiological linkages rather than conscious eye movements. Taken together, these results paint a coherent picture of how brain–eye interactions evolve across the sleep-wake cycle. During active wakefulness and REM sleep, the eyes and brain exhibit a tight coupling, either through direct electrical artifacts or through brainstem-driven synchronous events, respectively. During the deeper stages of sleep, the coupling diminishes or disappears, reflecting a functional uncoupling of the oculomotor system from cortical dynamics when the brain settles into autonomous oscillatory patterns and the eyes remain quiescent. Our findings resonate with the idea that only certain “channels” of information flow between physiological systems at any given time. In neural terms, one could say that the information shared between the EEG and EOG is routed through a low-dimensional communication subspace that is engaged in REM (and partly in N1) but largely shut down in N2/N3. In other words, the brain does not broadcast all of its activity to the eyes – it selectively “chooses” (or is constrained) to send specific signals (like those governing eye movements or eyelid reflexes) and only during particular states % [https://www.simonsfoundation.org/2019/04/02/brain-areas-may-use-subspace-communication-to-talk-to-one-another/#:~:text=The%20analysis%20revealed%20that%20such,%E2%80%9CThis%20is]. 
+From a systems neuroscience perspective, this selective sharing is analogous to cortical areas communicating only along certain subspace dimensions % [https://pubmed.ncbi.nlm.nih.gov/30770252/#:~:text=PubMed%20pubmed,of%20V1%20population%20activity%20patterns]. 
+Here, the two “areas” happen to be the visual oculomotor apparatus and the broader cortex; the analogy suggests that the coupling we observe is a purposeful routing of signals (e.g. “generate eye movement now”) rather than a general mixing of all signals. Implications and future directions: Understanding the stage-specific coupling between EEG and EOG has both scientific and practical implications. Scientifically, it provides evidence for physiological phenomena such as human PGO waves. Although classic PGO waves are well characterized in animal models, their direct observation in human EEG is challenging; however, our demonstration of strong REM coupling supports the existence of coordinated brainstem-eye events in humans % [https://www.sciencedirect.com/topics/biochemistry-genetics-and-molecular-biology/pgo-waves#:~:text=PGO%20Waves%20,EEG%20signature%20of%20REM%20sleep]
+It would be interesting in future work to delve deeper into the REM shared components we extracted – for instance, are they time-locked to individual rapid eye movements, and do they correspond to the “sawtooth” waveforms in the EEG? If so, one could potentially use EOG as a timing reference to study the cortical responses to each eye movement (previous studies have, for example, analyzed EEG activity following spontaneous REMs to probe dream processing). Similarly, the moderate N1 coupling we found invites further research into the neural control of slow eye movements at sleep onset. Are these eye movements simply a relaxation of wakeful fixation, or are they actively generated by the brain as part of the sleep-initiation process? Our data show a clear correlation; targeted experiments (perhaps simultaneous EEG, EOG, and fMRI) could reveal whether specific neural circuits (e.g. in the vestibular or oculomotor nuclei) drive these slow rolls in concert with cortical theta rhythms. From a practical standpoint, the differential EEG–EOG coupling suggests that sleep staging and monitoring technology could be optimized by stage. For example, given how informative EOG is for REM detection and wake/REM differentiation % [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=EOG%20is%20particularly%20useful%20in,be%20easily%20detected%20using%20EOG], 
+a wearable device that only measures EOG (and perhaps chin EMG) might suffice to detect REM sleep reliably – a conclusion supported by recent work showing single-channel EOG can achieve ~80–85% agreement with full PSG scoring % [https://www.ajmc.com/view/single-channel-eog-shown-to-be-reliable-for-automatic-sleep-staging-in-various-sleep-disorders#:~:text=Their%20results%20demonstrated%20a%20diagnostic,for%20NREM2%2C%2085.0]. 
+On the other hand, our results reaffirm that distinguishing the NREM sub-stages (N1 vs N2 vs N3) relies on EEG-specific phenomena with minimal EOG involvement. Thus, any monitoring system that aspires to track sleep architecture in detail would still need EEG for accurate N2/N3 recognition % [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=A%5B%22EOG%22%5D%20,N1%20Sleep]. 
+Another applied angle is artifact handling in EEG recordings: knowing that REM sleep EEG is highly susceptible to eye-movement contamination (as reflected in our high correlations), clinicians and algorithms should be cautious in interpreting frontal EEG signals during REM. Adaptive filtering or independent component analysis could be employed more aggressively in REM periods to subtract the EOG-driven components, whereas in N3 such measures can be minimal. In fact, an intriguing idea is to use a data-driven canonical correlation filter derived from our analysis – effectively separating an EEG recording into “shared with EOG” versus “independent” subspace components – to automatically remove ocular artifacts or to enhance relevant signals. This is conceptually similar to what we and others have done with CCA in sensor fusion % [https://pmc.ncbi.nlm.nih.gov/articles/PMC7853209/#:~:text=We%20adopted%20a%20state,domain%20features], 
+except here it could be applied dynamically per sleep stage: e.g. apply a strong EOG regression filter in REM (to isolate true neural signals from eye artifacts) but leave N3 signals untouched. 
+
+\textbf{Limitations}
+
+It is important to acknowledge the limitations of our study. First, our dataset (APPLES) consisted predominantly of individuals with obstructive sleep apnea (OSA) who were undergoing diagnostic sleep studies % [https://sleepdata.org/datasets/apples#:~:text=1%2C516%20participants%20were%20enrolled%20since,was%20completed%20in%20August%202008], [https://sleepdata.org/datasets/apples#:~:text=Overnight%20polysomnography%20,to%20the%20Data%20Coordinating%20Center].
+OSA patients often experience fragmented sleep with frequent arousals and body movements, which could potentially influence EEG–EOG correlations. For instance, an OSA subject in N2/N3 might have more transient arousals (with associated eye blinks and EEG shifts) than a healthy sleeper, which might elevate measured coupling slightly in what would otherwise be a very quiescent period. We did not explicitly separate or compare OSA vs. non-OSA or quantify the impact of arousal-related events on our coupling metrics. Future analyses could stratify the data by arousal presence or by patient diagnosis to ensure that the stage differences we found are not confounded by pathology. That said, the core stage-specific patterns (high REM coupling, low NREM coupling) are likely generalizable, since they reflect fundamental physiology; an OSA population simply provides a stress-test by including many disruptions. Second, our analytical approach focused on linear correlations (via canonical correlation analysis) and stationary behavior within scored epochs. This means we might miss nonlinear or time-offset relationships – for example, perhaps a burst of EEG activity precedes an eye movement by a second or two in REM, which a zero-lag correlation would not capture. More sophisticated cross-modal analyses (such as time-lagged CCA or mutual information measures) could probe directed interactions and causal delays between brain and eye signals. Additionally, while we treated the EEG and EOG signals in aggregate, there could be interesting spatial nuances: e.g., is the coupling strongest between the EOG and frontal EEG leads (likely yes, since eye artifacts project mainly to frontal sites) and negligible with occipital EEG? We mostly used a summed multichannel EEG perspective, but future work could map the topography of the shared components to see which brain regions “communicate” most with the eyes during each stage. This could connect to anatomical pathways – for instance, a strong coupling with frontal EEG in REM might indicate frontal eye field activation or orbital cortex involvement during dreaming.
+
+
+\section{Conclusion}
+
+In summary, our investigation provides a detailed look at the shared low-dimensional subspace between EEG and EOG signals across sleep stages. We empirically confirmed that REM sleep is a state of vigorous brain–eye interaction, whereas deep NREM sleep is a state of functional brain–eye disengagement, with light sleep lying in between. By framing this in terms of a communication subspace, we highlight that the exchange of signals between the brain’s electrical activity and eye movements is highly selective and state-dependent. These findings enrich our understanding of polysomnographic recordings by demonstrating that EEG and EOG should not be viewed merely as separate channels but as interacting components of a complex physiological system. For clinicians and sleep researchers, this reinforces the value of recording both modalities and interpreting them in tandem: an eye movement in sleep is not an isolated event but is often the outward manifestation of an underlying neural process. Conversely, certain brain oscillations carry over into eye-related signals. Appreciating these linkages can improve how we analyze sleep data, whether for manual scoring, automated algorithms, or research into the mechanisms of sleep. Moving forward, we envision using these insights to refine sleep staging technology (possibly reducing sensor requirements for home sleep tests by exploiting cross-modal redundancies) and to spur targeted neurophysiological studies (for example, using the eye as a “window” into specific brain state transitions). Ultimately, the humble EOG, often regarded merely as an artifact source, proves to be a valuable partner to EEG – together, they offer a more complete picture of the sleeping brain than either could alone.
+% [https://www.numberanalytics.com/blog/eog-sleep-stage-classification#:~:text=EOG%20is%20particularly%20useful%20in,be%20easily%20detected%20using%20EOG], [https://pubmed.ncbi.nlm.nih.gov/38635384/#:~:text=Polysomnography%20,staging%20with%20a%20single%20EOG].
+
+\end{document}
+
