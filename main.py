@@ -1,7 +1,8 @@
-import yaml
 import subprocess
 import os
+
 from src.logger import logger
+from src.config_loader import load_config
 
 # Helper to run a Python script
 def run_script(script_name):
@@ -15,32 +16,30 @@ def run_script(script_name):
     except subprocess.CalledProcessError as e:
         logger.error(f"Script {script_name} failed with error: {e}")
 
+
 def main():
-    # Load config file
+    # Load config using OmegaConf
     config_path = "src/config/config.yaml"
-    if not os.path.exists(config_path):
-        logger.error(f"Config file not found: {config_path}")
-        return
+    config = load_config(config_path)
 
-    with open(config_path, "r") as f:
-        config = yaml.safe_load(f)
+    # Step-by-step execution based on flags in run_params
+    run_flags = config.run_params
 
-    # Step-by-step execution based on config flags
-    if config.get("run_static_cca", False):
-        run_script("project_cca.py")
+    if run_flags.run_static_cca:
+        run_script("static_cca.py")
 
-    if config.get("run_time_resolved_cca", False):
-        run_script("time_resolved_cca_generator.py")
+    if run_flags.run_time_resolved_cca:
+        run_script("time_resolved_cca.py")
 
-    if config.get("run_static_analysis", False):
-        run_script("analyze_canonical_projections.py")
-        run_script("analyze_summary_stats.py")
+    if run_flags.run_static_analysis:
+        run_script("static_cca_analyze_canonical_projections.py")
+        run_script("stataic_cca_analyze_summary_stats.py")
 
-    if config.get("run_time_resolved_analysis", False):
-        run_script("analyze_time_resolved_cca.py")
-        run_script("time_resolved_analysis_thematically_groupped.py")    
+    if run_flags.run_time_resolved_analysis:
+        run_script("time_resolved_cca_analysis.py")
+        run_script("time_resolved_cca_plotting_groupped.py")
 
-    if config.get("generate_figures", False):
+    if run_flags.generate_figures:
         run_script("generate_figures_report.py")
 
     logger.info("Pipeline completed.")
