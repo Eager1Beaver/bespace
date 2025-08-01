@@ -1,3 +1,10 @@
+run_params:
+  run_static_cca: True
+  run_time_resolved_cca: True
+  run_static_analysis: True
+  run_time_resolved_analysis: True
+  generate_figures: True
+
 data:
   data_dir: "data/apples"
   eeg_channels: ['C3_M2', 'C4_M1', 'O1_M2', 'O2_M1']
@@ -5,14 +12,15 @@ data:
   sleep_stages: ['W', 'N1', 'N2', 'N3', 'R']
 
 static_cca_params:
-  is_perform_static_cca: True
   downsampling_factor: 1
   output_dir: "data/static_cca"
   results_dir: "data/static_cca_analysis"
 
 time_cca_params:
-  is_perform_time_cca: True
-  time_window: 30
-  time_step: 10
+  window_length: 30
+  step_length: 15
   output_dir: "data/time_resolved_cca"
   results_dir: "data/time_resolved_cca_analysis"
+
+report:
+  figures_folder: "report/figs"
