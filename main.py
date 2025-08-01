@@ -28,12 +28,12 @@ def main():
     if run_flags.run_static_cca:
         run_script("static_cca.py")
 
-    if run_flags.run_time_resolved_cca:
-        run_script("time_resolved_cca.py")
-
     if run_flags.run_static_analysis:
         run_script("static_cca_analyze_canonical_projections.py")
-        run_script("stataic_cca_analyze_summary_stats.py")
+        run_script("stataic_cca_analyze_summary_stats.py")    
+
+    if run_flags.run_time_resolved_cca:
+        run_script("time_resolved_cca.py")
 
     if run_flags.run_time_resolved_analysis:
         run_script("time_resolved_cca_analysis.py")
