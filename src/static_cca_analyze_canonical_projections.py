@@ -1,20 +1,25 @@
-import os
-import glob
-import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
+# static_cca_analyze_canonical_projections.py
 from scipy.stats import skew, kurtosis, f_oneway
+from config_loader import load_config
+import matplotlib.pyplot as plt
+from logger import logger
+import seaborn as sns
+import pandas as pd
+import numpy as np
+import glob
+import os
 
-# === PARAMETERS ===
-data_folder = "data"
-output_folder = "static_cca_analysis"
+# Parameters
+config = load_config()
+
+OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
+RESULTS_FOLDER = config.static_cca_params.results_dir # "data/static_cca_analysis"
 
 # File patterns
-pattern_Xc = os.path.join(data_folder, "static_cca", "*_Xc_downsampled.csv")
-pattern_Yc = os.path.join(data_folder, "static_cca", "*_Yc_downsampled.csv")
+pattern_Xc = os.path.join(OUTPUT_FOLDER, "*_Xc_downsampled.csv")
+pattern_Yc = os.path.join(OUTPUT_FOLDER, "*_Yc_downsampled.csv")
 
-# Helper to load projection CSVs
+# Projection loader
 def load_projection_files(pattern, prefix):
     """
     Loads all matching CSVs into long-form DataFrame.
@@ -28,7 +33,7 @@ def load_projection_files(pattern, prefix):
                              .replace("_Yc_downsampled.csv", "").split("_")
         
         if len(name_parts) != 2:
-            print(f"Skipping unexpected filename: {filename}")
+            logger.warning(f"Skipping unexpected filename: {filename}")
             continue
         
         subject, stage = name_parts
@@ -53,17 +58,17 @@ df_Xc = load_projection_files(pattern_Xc, "Xc")
 df_Yc = load_projection_files(pattern_Yc, "Yc")
 
 all_data = pd.concat([df_Xc, df_Yc], ignore_index=True)
-print(f"Loaded downsampled projections: {all_data.shape}")
+logger.info(f"Loaded downsampled projections: {all_data.shape}")
 
 if all_data.empty:
-    print("No data loaded! Check file paths and patterns.")
+    logger.warning("No data loaded! Check file paths and patterns.")
     exit()
 
 # Save combined file for convenience
-all_data.to_csv(os.path.join(data_folder, "static_cca", "all_downsampled_projections.csv"), index=False)
-print("Saved combined downsampled data.")
+all_data.to_csv(os.path.join(OUTPUT_FOLDER, "all_downsampled_projections.csv"), index=False)
+logger.info("Saved combined downsampled data.")
 
-# --- Plot distributions per stage and projection
+# Plot distributions per stage and projection
 for proj_type in ["Xc", "Yc"]:
     for comp in ["1", "2"]:
         projection_name = f"{proj_type}_{comp}"
@@ -74,7 +79,7 @@ for proj_type in ["Xc", "Yc"]:
         ]
 
         if df_plot.empty:
-            print(f"No data for {projection_name}")
+            logger.warning(f"No data for {projection_name}")
             continue
 
         # KDE Plot
@@ -91,9 +96,9 @@ for proj_type in ["Xc", "Yc"]:
         plt.title(f"Density of {projection_name} across stages")
         plt.grid(alpha=0.3)
         plt.tight_layout()
-        plt.savefig(os.path.join(data_folder, output_folder, f"{projection_name}_kde.png"))
+        plt.savefig(os.path.join(RESULTS_FOLDER, f"{projection_name}_kde.png"))
         plt.close()
-        print(f"Saved density plot for {projection_name}")
+        logger.info(f"Saved density plot for {projection_name}")
 
         # Boxplot
         plt.figure(figsize=(8,5))
@@ -106,11 +111,11 @@ for proj_type in ["Xc", "Yc"]:
         plt.title(f"Boxplot of {projection_name} across stages")
         plt.grid(alpha=0.3)
         plt.tight_layout()
-        plt.savefig(os.path.join(data_folder, output_folder, f"{projection_name}_boxplot.png"))
+        plt.savefig(os.path.join(RESULTS_FOLDER, f"{projection_name}_boxplot.png"))
         plt.close()
-        print(f"Saved boxplot for {projection_name}")
+        logger.info(f"Saved boxplot for {projection_name}")
 
-# --- Compute summary statistics by stage and projection
+# Compute summary statistics by stage and projection
 summary_rows = []
 for proj_type in ["Xc", "Yc"]:
     for comp in ["1", "2"]:
@@ -135,11 +140,11 @@ for proj_type in ["Xc", "Yc"]:
             })
 
 summary_df = pd.DataFrame(summary_rows)
-summary_csv = os.path.join(data_folder, output_folder, "canonical_projection_summary_by_stage.csv")
+summary_csv = os.path.join(RESULTS_FOLDER, "canonical_projection_summary_by_stage.csv")
 summary_df.to_csv(summary_csv, index=False)
-print(f"Saved summary stats to {summary_csv}")
+logger.info(f"Saved summary stats to {summary_csv}")
 
-# --- Run ANOVA across stages
+# Run ANOVA across stages
 for proj_type in ["Xc", "Yc"]:
     for comp in ["1", "2"]:
         projection_name = f"{proj_type}_{comp}"
@@ -153,4 +158,4 @@ for proj_type in ["Xc", "Yc"]:
         groups = [g["value"].values for _, g in df_proj.groupby("stage")]
         if len(groups) > 1:
             fval, pval = f_oneway(*groups)
-            print(f"ANOVA for {projection_name}: F = {fval:.3f}, p = {pval:.3e}")
+            logger.info(f"ANOVA for {projection_name}: F = {fval:.3f}, p = {pval:.3e}")

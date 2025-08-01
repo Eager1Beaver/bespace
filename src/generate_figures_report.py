@@ -1,21 +1,25 @@
-import os
-import pandas as pd
+# generate_figures_report.py
+from config_loader import load_config
 import matplotlib.pyplot as plt
+from logger import logger
 import seaborn as sns
+import pandas as pd
+import os
 
-# === Parameters ===
-data_folder = "data/time_resolved_cca_analysis"
-summary_folder = "data"
-output_folder = "report/figs"
-os.makedirs(output_folder, exist_ok=True)
+# Parameters
+config = load_config()
 
-# === Load Data ===
-summary_df = pd.read_csv(os.path.join(summary_folder, "static_cca", "eeg_eog_cca_summary_stats.csv"))
-subset_trajectories = pd.read_csv(os.path.join(data_folder, "subset_trajectories.csv"))
-mean_cca_trajectory_by_stage = pd.read_csv(os.path.join(data_folder, "mean_cca_trajectory_by_stage.csv"))
-entropy_by_subject_stage = pd.read_csv(os.path.join(data_folder, "entropy_by_subject_stage.csv"))
+SUMMARY_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
+TIME_RESOLVED_RESULTS_FOLDER = config.time_cca_params.results_dir  # "data/time_resolved_cca_analysis"
+REPORT_FIGURES_FOLDER = config.report.figures_folder  # "report/figs"
 
-# === Figure 1: Static CCA Boxplots ===
+# Load data
+summary_df = pd.read_csv(os.path.join(SUMMARY_FOLDER, "eeg_eog_cca_summary_stats.csv"))
+subset_trajectories = pd.read_csv(os.path.join(TIME_RESOLVED_RESULTS_FOLDER, "subset_trajectories.csv"))
+mean_cca_trajectory_by_stage = pd.read_csv(os.path.join(TIME_RESOLVED_RESULTS_FOLDER, "mean_cca_trajectory_by_stage.csv"))
+entropy_by_subject_stage = pd.read_csv(os.path.join(TIME_RESOLVED_RESULTS_FOLDER, "entropy_by_subject_stage.csv"))
+
+# Figure 1: Static CCA Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x="stage", y="cca_corr1", data=summary_df, showmeans=True, ax=axs[0])
 axs[0].set_title("Static CCA: cca_corr1")
@@ -33,10 +37,11 @@ axs[1].yaxis.set_visible(False)
 fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
 
 plt.tight_layout()
-plt.savefig(os.path.join(output_folder, "figure1_static_cca_boxplots.png"))
+plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure1_static_cca_boxplots.png"))
 plt.close()
+logger.info("Saved static CCA boxplots.")
 
-# === Figure 2: Time-resolved CCA Boxplots ===
+# Figure 2: Time-resolved CCA Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x='stage', y='cca_corr1', data=subset_trajectories, ax=axs[0])
 axs[0].set_title('Time-Resolved CCA: cca_corr1')
@@ -54,10 +59,11 @@ axs[1].yaxis.set_visible(False)
 fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
 
 plt.tight_layout()
-plt.savefig(os.path.join(output_folder, "figure2_time_resolved_boxplots.png"))
+plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure2_time_resolved_boxplots.png"))
 plt.close()
+logger.info("Saved time-resolved CCA boxplots.")
 
-# === Figure 3: Mean Trajectories by Stage ===
+# Figure 3: Mean Trajectories by Stage
 fig, axs = plt.subplots(1, 2, figsize=(14, 5))
 for stage in mean_cca_trajectory_by_stage['stage'].unique():
     data = mean_cca_trajectory_by_stage[mean_cca_trajectory_by_stage['stage'] == stage]
@@ -94,10 +100,11 @@ fig.legend(
 
 # Leave extra space at bottom for legend
 plt.tight_layout(rect=[0, 0, 1, 0.95])
-plt.savefig(os.path.join(output_folder, "figure3_cca_trajectories.png"))
+plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure3_cca_trajectories.png"))
 plt.close()
+logger.info("Saved mean CCA trajectories by stage.")
 
-# === Figure 4: Entropy Boxplots ===
+# Figure 4: Entropy Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x='stage', y='cca_corr1_compute_entropy', data=entropy_by_subject_stage, ax=axs[0])
 axs[0].set_title("Entropy: cca_corr1")
@@ -115,5 +122,6 @@ axs[1].yaxis.set_visible(False)
 fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
 
 plt.tight_layout()
-plt.savefig(os.path.join(output_folder, "figure4_entropy_boxplots.png"))
+plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure4_entropy_boxplots.png"))
 plt.close()
+logger.info("Saved entropy boxplots for CCA correlations.")

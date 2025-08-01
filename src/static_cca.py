@@ -1,36 +1,35 @@
-import os
-import numpy as np
-import pandas as pd
-from datetime import datetime, timedelta
-from collections import Counter
-#from scipy.linalg import subspace_angles
-#from sklearn.decomposition import PCA
-#from sklearn.decomposition import FastICA
+# static_cca.py
 from sklearn.cross_decomposition import CCA
-
-import matplotlib.pyplot as plt
-
+from datetime import datetime, timedelta
+from config_loader import load_config
+from collections import Counter
+from logger import logger
+import pandas as pd
+import numpy as np
 import mne
+import os
+import gc
 
 # Parameters
-data_folder = "data"
-eeg_channels = ['C3_M2', 'C4_M1', 'O1_M2', 'O2_M1']
-eog_channels = ['LOC', 'ROC']
-valid_stages = ['W', 'N1', 'N2', 'N3', 'R']
+config = load_config()
+
+DATA_FOLDER = config.data.data_dir # "data/apples"
+OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
+EEG_CHANNELS = config.data.eeg_channels # ['C3_M2', 'C4_M1', 'O1_M2', 'O2_M1']
+EOG_CHANNELS = config.data.eog_channels # ['LOC', 'ROC']
+SLEEP_STAGES = config.data.sleep_stages # ['W', 'N1', 'N2', 'N3', 'R']
+DOWNSAMPLING_FACTOR = config.static_cca_params.downsampling_factor # 1
 fmt = "%H:%M:%S"
-#t0 = datetime.strptime("23:02:00", fmt)  # Reference start time
 
 # Initialize results list
 summary_results = []
 
-# Iterate through files
-file_pairs = [(f, f.replace(".edf", ".annot")) for f in os.listdir(data_folder) if f.endswith(".edf")]
+# Iterate through .edf/.annot files
+file_pairs = [(f, f.replace(".edf", ".annot")) for f in os.listdir(DATA_FOLDER) if f.endswith(".edf")]
 
 for edf_file, annot_file in file_pairs:
-    edf_path = os.path.join(data_folder, edf_file)
-    #if not edf_path.endswith("apples-170368.edf"):
-    #    continue
-    annot_path = os.path.join(data_folder, annot_file)
+    edf_path = os.path.join(DATA_FOLDER, edf_file)
+    annot_path = os.path.join(DATA_FOLDER, annot_file)
 
     if not os.path.exists(annot_path):
         continue
@@ -39,14 +38,7 @@ for edf_file, annot_file in file_pairs:
         raw = mne.io.read_raw_edf(edf_path, preload=True, verbose=False)
         sfreq = int(raw.info['sfreq'])
         start_datetime = raw.info['meas_date'].replace(tzinfo=None)
-        print(f"EDF {edf_path} Start:", start_datetime)
-
-        #print(f"{edf_file}: total samples = {raw.n_times}, sfreq = {sfreq}")
-
-        #channel_names = raw.ch_names
-        #n_channels = len(channel_names)
-        #print(f"Number of channels: {n_channels}")
-        #print(f"Channels avail: {channel_names}")
+        logger.info(f"EDF {edf_path} Start:", start_datetime)
 
         # Read annotations
         with open(annot_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -61,7 +53,7 @@ for edf_file, annot_file in file_pairs:
 
         parsed_epochs = []
         for stage, start_str, stop_str in annotations:
-            if stage in valid_stages:
+            if stage in SLEEP_STAGES:
                 try:
                     start_clock = datetime.strptime(start_str, fmt).time()
                     stop_clock = datetime.strptime(stop_str, fmt).time()
@@ -81,46 +73,41 @@ for edf_file, annot_file in file_pairs:
 
                     parsed_epochs.append((stage, start_sec, stop_sec))
                 except Exception as e:
-                    print(f"Annotation parse error: {e}")
+                    logger.error(f"Annotation parse error: {e}")
 
 
-        print('epochs parsed: ', parsed_epochs[:5])
+        logger.info('Epochs parsed: ', parsed_epochs[:5])
         stage_counts = Counter([stage for stage, _, _ in parsed_epochs])
-        print(f'Stage count for subject {edf_file}: {stage_counts}')
+        logger.info(f'Stage count for subject {edf_file}: {stage_counts}')
 
         # Organize EEG and EOG segments
-        eeg_data = {stage: [] for stage in valid_stages}
-        eog_data = {stage: [] for stage in valid_stages}
+        eeg_data = {stage: [] for stage in SLEEP_STAGES}
+        eog_data = {stage: [] for stage in SLEEP_STAGES}
         for s, start, stop in parsed_epochs:
-            #if s == "R" and edf_path.endswith("apples-170368.edf"):
-            #    print(f"Stage R interval: {start}–{stop} sec → samples {int(start * sfreq)}–{int(stop * sfreq)}")
-
-            #start_sample = int(start * sfreq)
-            #stop_sample = min(int(stop * sfreq), raw.n_times)
             start_sample = round(start * sfreq)
             stop_sample = min(round(stop * sfreq), raw.n_times)
 
             if start_sample < 0 or start_sample >= stop_sample:
-                print(f"Invalid sample range for stage {s}: start={start_sample}, stop={stop_sample}, total={raw.n_times}")
+                logger.warning(f"Invalid sample range for stage {s}: start={start_sample}, stop={stop_sample}, total={raw.n_times}")
                 continue
 
             try:
-                eeg = raw.get_data(picks=eeg_channels, start=start_sample, stop=stop_sample)
-                eog = raw.get_data(picks=eog_channels, start=start_sample, stop=stop_sample)
+                eeg = raw.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
+                eog = raw.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
                 eeg_data[s].append(eeg)
                 eog_data[s].append(eog)
             except Exception as e:
-                print(f"Failed to extract data: stage={s}, start={start_sample}, stop={stop_sample}, error: {e}")
+                logger.error(f"Failed to extract data: stage={s}, start={start_sample}, stop={stop_sample}, error: {e}")
                 continue
 
-        # Define downsampling factor (e.g. 1 Hz)
-        target_fs = 1
+        # Set a downsampling factor
+        target_fs = DOWNSAMPLING_FACTOR
         factor = int(sfreq / target_fs)
 
         # Perform CCA
-        for stage in valid_stages:
+        for stage in SLEEP_STAGES:
             if not eeg_data[stage] or not eog_data[stage]:
-                print(f"Skipping stage {stage}: no data available.")
+                logger.info(f"Skipping stage {stage}: no data available.")
                 continue
             eeg_agg = np.hstack(eeg_data[stage])
             eog_agg = np.hstack(eog_data[stage])
@@ -150,16 +137,16 @@ for edf_file, annot_file in file_pairs:
 
                 # Save downsampled projections
                 pd.DataFrame(X_c_ds, columns=["Xc_1", "Xc_2"]).to_csv(
-                    os.path.join(data_folder, f"{file_prefix}_Xc_downsampled.csv"), index=False
+                    os.path.join(OUTPUT_FOLDER, f"{file_prefix}_Xc_downsampled.csv"), index=False
                 )
                 pd.DataFrame(Y_c_ds, columns=["Yc_1", "Yc_2"]).to_csv(
-                    os.path.join(data_folder, f"{file_prefix}_Yc_downsampled.csv"), index=False
+                    os.path.join(OUTPUT_FOLDER, f"{file_prefix}_Yc_downsampled.csv"), index=False
                 )
 
                 # Compute canonical correlation coefficients
                 corr_coeffs = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(X_c.shape[1])]
                 
-                # ---- Compute summary statistics ----
+                # Compute summary statistics
                 summary = {
                     "subject": edf_file,
                     "stage": stage,
@@ -184,23 +171,21 @@ for edf_file, annot_file in file_pairs:
                     summary[f"Yc{idx+1}_75p"] = np.percentile(y_vals, 75)
 
                 summary_results.append(summary)
-                print(f'Summary resulst for edf {edf_file} for stage {stage} written')
+                logger.info(f'Summary resulst for edf {edf_file} for stage {stage} written')
 
             except Exception as e:
-                print(f"CCA failed for {edf_file}, stage {stage}: {e}")
+                logger.error(f"CCA failed for {edf_file}, stage {stage}: {e}")
     except Exception as e:
-        print(f"Failed on {edf_file}: {e}")
-    #    
+        logger.error(f"Failed on {edf_file}: {e}")
+    #
         raw._data = None  # Detach memory-mapped data if present
         raw.annotations.delete(0, len(raw.annotations))  # Clear MNE annotations    
         del raw, eeg_data, eog_data
-        import gc
-        gc.collect()    
+        gc.collect() # Clean up memory
 
 # Save results
 results_df = pd.DataFrame(summary_results)
-results_csv_path = os.path.join(data_folder, "eeg_eog_cca_summary_stats.csv")
+results_csv_path = os.path.join(OUTPUT_FOLDER, "eeg_eog_cca_summary_stats.csv")
 results_df.to_csv(results_csv_path, index=False)
 
-print('Results')
-print(results_df)
+logger.info(f'The summary statistics saved to {results_csv_path}')
