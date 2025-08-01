@@ -16,24 +16,41 @@ The study uses the publicly available **APPLES dataset** from the [National Slee
 ## Repository Structure
 
 ```
-.
+bespace/
+│
+├── .gitignore
 ├── main.py
-├── src/
-│   ├── config/config.yaml             # Project settings
-│   ├── config_loader.py               # Reads config via OmegaConf
-│   ├── logger.py                      # Logs status and errors
-│   ├── project_cca.py                 # Static CCA by sleep stage
-│   ├── time_resolved_cca_generator.py # Time-windowed CCA
-│   ├── analyze_time_resolved_cca.py   # Entropy, stats, trajectories
-│   ├── time_resolved_analysis_thematically_groupped.py  # Figures
-│   ├── analyze_canonical_projections.py # Xc/Yc projection stats
-│   ├── analyze_summary_stats.py       # Summary plots/stats
-│   └── generate_figures_report.py     # Final figures for report
-├── data/                              # EDFs, annotations, and output
-├── report/figs/                       # Final PNG figures
-├── requirements.txt
 ├── pyproject.toml
-└── README.md
+├── README.md
+├── requirements.txt
+├── bespace.code-workspace
+│
+├── data/                            
+│   └── ...                          # Contains EDFs, annotations, outputs
+│
+├── report/
+│   ├── figs/                        # Contains final figures (.png)
+│   ├── report.tex                   # LaTeX report source
+│   ├── preamble.tex                 # LaTeX preamble
+│   └── report.pdf                   # Final compiled report
+│
+└── src/
+    ├── config/
+    │   └── config.yaml             # All runtime settings and parameters
+    │
+    ├── config_loader.py            # Loads config.yaml using OmegaConf
+    ├── logger.py                   # Logging configuration
+    │
+    ├── static_cca.py                                # Static CCA per stage
+    ├── static_cca_analyze_summary_stats.py          # Stats: boxplots, ANOVA
+    ├── static_cca_analyze_canonical_projections.py  # Xc/Yc KDEs and stats
+    │
+    ├── time_resolved_cca.py                         # Time-windowed CCA
+    ├── time_resolved_cca_analysis.py                # Stats, entropy, trajectories
+    ├── time_resolved_cca_plotting_groupped.py       # Visualization per theme
+    │
+    └── generate_figures_report.py                   # Final multi-panel figures
+
 ```
 
 ---
@@ -58,7 +75,7 @@ pip install .
 
 ---
 
-## Configuration
+## ⚙️ Configuration
 
 All pipeline behavior is controlled from:
 ```
