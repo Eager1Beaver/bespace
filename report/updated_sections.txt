@@ -1,0 +1,37 @@
+Discussion
+This study explored the low-dimensional communication subspace shared between EEG and EOG signals across distinct sleep stages, using canonical correlation analysis (CCA) as a tool to estimate coupling strength. Our findings provide a clear, data-driven characterization of how EEG–EOG correlation patterns vary systematically across the sleep cycle, offering insights into the evolving relationship between cortical and oculomotor systems.
+
+We observed a consistent increase in EEG–EOG coupling with sleep depth, with both the first and second canonical correlations (cca_corr1 and cca_corr2) increasing from Wake to N3 (Figure 1). These findings were robust across both static and time-resolved CCA analyses. Notably, cca_corr1 increased from 0.55 ± 0.14 during Wake to 0.86 ± 0.06 during N3, while cca_corr2 rose from 0.36 ± 0.15 to 0.63 ± 0.10. REM and N1 stages exhibited intermediate levels of coupling, closer to Wake than to N2 or N3. This pattern was replicated in the time-resolved analysis (Figure 2), further supporting the sleep-stage specificity of EEG–EOG coupling.
+
+Importantly, the temporal trajectories (Figure 3) revealed that these coupling dynamics are stable over time within stages, particularly in N2 and N3, while greater variability was seen during Wake and REM. This observation was supported by entropy analysis (Figure 4), which demonstrated lower entropy of canonical correlations during deep NREM sleep compared to Wake and REM. The reduced entropy indicates that during deeper sleep, EEG–EOG coupling becomes more consistent and less dynamically fluctuating.
+
+Taken together, our results suggest that sleep depth is associated not only with stronger EEG–EOG coupling but also with greater regularity in this coupling. This may reflect increased synchronization between cortical and oculomotor systems during deeper stages of sleep, possibly due to a general reduction in sensory input and motor variability. Conversely, higher entropy and lower average correlations in Wake and REM may reflect more complex or variable interactions between these systems in states with richer perceptual or dream content.
+
+The consistent difference between cca_corr1 and cca_corr2 across all stages also suggests that the shared subspace is not fully captured by a single dominant mode of communication. The second canonical mode retains meaningful variance, particularly during Wake and REM, further hinting at the multiplexed nature of EEG–EOG interactions in more active states.
+
+These results provide a novel view of sleep physiology by focusing on intermodality communication dynamics, rather than univariate power spectra or localized EEG features. By leveraging CCA to characterize the strength and stability of cross-modal coupling, we offer an additional dimension of analysis that may be informative for future investigations into sleep architecture and its disruption in clinical populations.
+
+
+
+Limitations
+Several limitations of the present study should be noted.
+
+First, while we explored EEG–EOG coupling across sleep stages using CCA, we did not explicitly model or remove potential confounding factors such as artifacts, eye blinks, or muscular activity, especially in wakeful and REM stages. Although preprocessing and segmentation were applied to mitigate this, residual physiological or non-physiological noise could have influenced the correlation estimates, particularly for cca_corr2, which tends to capture subtler modes of interaction.
+
+Second, the dataset used (APPLES) includes subjects with varying sleep pathologies, notably obstructive sleep apnea syndrome (OSAS), although we did not explicitly stratify or control for clinical subgroups due to the lack of metadata in the analyzed subset. Thus, our findings reflect average coupling patterns across a heterogeneous population and may not generalize cleanly to healthy individuals or specific clinical cohorts.
+
+Third, our focus was limited to a subset of EEG and EOG channels (C3, C4, LOC, ROC) selected for their representativeness. While this allowed tractable computation and clearer interpretation, it may have excluded additional coupling patterns present in other regions or channels.
+
+Fourth, although we used time-resolved analysis to improve temporal specificity, our binning strategy (10-minute bins) trades off fine-grained resolution for statistical robustness. Transient or phasic coupling events, particularly in REM or during transitions between stages, may have been smoothed out.
+
+Finally, we relied exclusively on CCA to characterize the EEG–EOG subspace. While well-suited for linear coupling, CCA may miss nonlinear relationships. Future work may benefit from integrating nonlinear methods (e.g., kernel CCA, mutual information) to probe richer dynamics in the communication subspace.
+
+
+
+Conclusion
+In this study, we investigated the low-dimensional communication subspace shared between EEG and EOG signals across sleep stages. Using both static and time-resolved canonical correlation analysis, we demonstrated that EEG–EOG coupling increases with sleep depth and becomes more temporally stable during N2 and N3 stages. Conversely, lighter stages such as Wake and REM exhibited lower correlation values and higher entropy, indicating more variable cross-modal dynamics.
+
+These findings suggest that the coordination between cortical and oculomotor systems is systematically modulated across the sleep cycle, with deeper sleep characterized by stronger and more consistent coupling. This highlights the value of examining cross-modal neural interactions—not just within but across physiological systems—to gain a more integrative view of sleep.
+
+Our work contributes to a growing interest in multimodal neural communication by showing that even canonical signal types like EEG and EOG exhibit structured coupling patterns that reflect underlying sleep architecture. These insights may serve as a foundation for future work exploring disruptions of inter-system communication in sleep disorders or altered states of consciousness.
+
