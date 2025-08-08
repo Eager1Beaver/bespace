@@ -8,17 +8,18 @@
 % Abstract
 \section{Abstract}
 
-\textbf{Background}\\
+%\textbf{Background}\\
+EEG and EOG signals are fundamental components of sleep monitoring, yet their joint dynamics remain underexplored. While these modalities are often treated separately, recent evidence suggests overlapping signal content and potential interactions that reflect underlying neurophysiological coordination. Understanding how this coordination evolves across sleep stages may reveal new insights into brain-eye communication during sleep.
 \textbf{Aim}: To quantify how strongly EEG and EOG signals couple across human sleep stages.
 
-\textbf{Methods}\\
+%\textbf{Methods}\\
 Overnight PSG from 29 adults were segmented into Wake, N1, N2, N3 and REM. Canonical correlation analysis (CCA) extracted the first two shared dimensions ($\rho_1$, $\rho_2$) in static stage-wise blocks and in 30 s sliding windows.
 
-\textbf{Results}\\
+%\textbf{Results}\\
 Stage-wise $\rho_1$ and $\rho_2$ increased from Wake to N3, with REM and N1 showing intermediate coupling. Time-resolved analysis confirmed greater strength and stability in deeper stages, while coupling entropy was highest in Wake and REM.
 
-\textbf{Conclusion}\\
-EEG and EOG share a state-dependent low-dimensional subspace that is strongest in N3, moderate in N1 and REM, and minimal in Wake and N2. These findings refine our understanding of brain-eye interactions and support stage-aware sensing and analysis in sleep research.
+%\textbf{Conclusion}\\
+EEG and EOG share a state-dependent low-dimensional subspace that is strongest in N3, high in N2, moderate in N1 and REM, and minimal in Wake. These findings refine our understanding of brain-eye interactions and support stage-aware sensing and analysis in sleep research.
 
 \textbf{Keywords: EEG, EOG, CCA}
 
@@ -48,7 +49,7 @@ We adopted Canonical Correlation Analysis (CCA) for its robustness and interpret
 
 \subsection{Time-Resolved CCA Analysis}
 
-To characterize the temporal evolution of EEG–EOG coupling across sleep stages, the same two-component CCA was run in sliding windows of 30 s with a 15 s step ($50\%$ overlap). These values were analysed in three ways:
+To characterize the temporal evolution of EEG–EOG coupling across sleep stages, the same two-component CCA was run in sliding windows of 30 s with a 15 s step ($50\%$ overlap). To better capture long-range trends in coupling dynamics, we averaged CCA values into non-overlapping 10-minute bins across the night, enabling visualization of stage-specific coupling profiles with reduced high-frequency variability. These values were analysed in three ways:
 \begin{itemize}
     \item Stage-wise aggregation: mean and dispersion of $\rho_1$ and $\rho_2$ across all windows within each stage.
     \item Overnight trajectories:10-min bin averages to visualise stage-specific coupling trends across the recording.
@@ -102,13 +103,14 @@ Mean and variance of the individual canonical projections showed no stage effect
 \section{Discussion}
 
 This study quantified the low-dimensional communication subspace shared between EEG and EOG signals across sleep stages using CCA. Both static and time-resolved analyses revealed a robust increase in coupling strength with sleep depth: the first canonical correlation $\rho_1$ rose from 0.55$\pm$0.14 in Wake to 0.86$\pm$0.06 in N3, and the second $\rho_2$ from 0.36$\pm$0.15 to 0.63$\pm$0.10. REM and N1 showed intermediate coupling, closer to Wake than to N2/N3 --- a pattern replicated across time windows, further supporting the sleep-stage specificity of EEG-EOG coupling.
-Temporal trajectories showed stable coupling in N2/N3 and greater variability in Wake and REM as they showing lower correlation values and higher entropy, supported by entropy measures. Lower entropy in deep sleep suggests more consistent EEG-EOG coordination, potentially reflecting reduced sensory input and motor variability. In contrast, higher entropy in Wake and REM may reflect more complex and dynamic brain-eye interactions. The persistent contribution of $\rho_2$ across all stages, especially in Wake and REM, suggests that EEG-EOG interactions are not dominated by a single mode, but instead reflect multiplexed coupling mechanisms in more active states.
+Temporal trajectories showed stable coupling in N2/N3 and greater variability in Wake and REM as they showing lower correlation values and higher entropy, supported by entropy measures. Lower entropy in deep sleep suggests more consistent EEG-EOG coordination, potentially reflecting reduced sensory input and motor variability. In contrast, higher entropy in Wake and REM may reflect more complex and dynamic brain-eye interactions. The persistent contribution of $\rho_2$ across all stages, especially in Wake and REM, suggests that EEG-EOG interactions are not dominated by a single mode, but instead reflect multiplexed coupling mechanisms in more active states. These findings may have practical implications for both research and clinical applications. Given the sensitivity of EEG-EOG coupling to sleep depth and stage transitions, CCA-derived features could enhance automatic sleep staging algorithms, particularly in distinguishing REM from N1 or Wake. Furthermore, altered coupling profiles may serve as markers of disrupted sleep architecture in conditions such as obstructive sleep apnea or REM behavior disorder. Future studies should investigate how these coupling metrics vary in pathological sleep and whether they offer diagnostic or prognostic value.
 
 \textbf{Limitations}
 This study has several limitations. First, although preprocessing was applied, residual artifacts (e.g., blinks, muscle activity) may have influenced coupling estimates, especially in wake and REM stages. Second, the APPLES dataset includes individuals with varying sleep pathologies (e.g., OSAS), but we did not stratify by clinical status due to metadata constraints, limiting generalizability. Third, our analysis focused on a subset of EEG (C3, C4) and EOG (LOC, ROC) channels; while representative, this may miss spatially distributed coupling patterns. Fourth, our use of 10-minute time bins improved stability but may have smoothed out transient events during REM or stage transitions. Finally, CCA captures only linear relationships; incorporating nonlinear approaches (e.g., kernel CCA or mutual information) may reveal richer coupling dynamics in future work.
 
-\section{Conclusion}
-This study shows that EEG and EOG signals share a low-dimensional subspace whose strength and temporal stability vary systematically across sleep stages. Coupling was strongest and most consistent in N2 and N3, and more variable in Wake and REM. These findings suggest structured coordination between cortical and oculomotor systems that tracks sleep depth. By focusing on intermodality dynamics via CCA, our approach offers a compact, interpretable view of sleep architecture that may inform future studies of sleep disorders and altered states.
+%\section{Conclusion}
+\textbf{Conclusion}
+This study shows that EEG and EOG signals share a low-dimensional subspace whose strength and temporal stability vary systematically across sleep stages. Coupling was strongest and most consistent in N3 and N2, moderate in N1 and REM, and weakest in Wake. These findings suggest structured coordination between cortical and oculomotor systems that tracks sleep depth. By focusing on intermodality dynamics via CCA, our approach offers a compact, interpretable view of sleep architecture that may inform future studies of sleep disorders and altered states.
 
 \renewcommand{\baselinestretch}{1.5}
 %\singlespacing
