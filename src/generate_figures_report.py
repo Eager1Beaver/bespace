@@ -7,6 +7,8 @@ import pandas as pd
 import os
 
 # Parameters
+#plt.rcParams['text.usetex'] = True  # Enable LaTeX rendering
+
 config = load_config()
 
 SUMMARY_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
@@ -22,19 +24,19 @@ entropy_by_subject_stage = pd.read_csv(os.path.join(TIME_RESOLVED_RESULTS_FOLDER
 # Figure 1: Static CCA Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x="stage", y="cca_corr1", data=summary_df, showmeans=True, ax=axs[0])
-axs[0].set_title("Static CCA: cca_corr1")
+axs[0].set_title(r"Static CCA: $\rho_1$")
 axs[0].set_ylabel("Correlation")
 axs[0].grid(alpha=0.3)
 axs[0].set_ylim(0,1)
-fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 sns.boxplot(x="stage", y="cca_corr2", data=summary_df, showmeans=True, ax=axs[1])
-axs[1].set_title("Static CCA: cca_corr2")
+axs[1].set_title(r"Static CCA: $\rho_2$")
 #axs[1].set_ylabel("Correlation")
 axs[1].grid(alpha=0.3)
 axs[1].set_ylim(0,1)
 axs[1].yaxis.set_visible(False)
-fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 plt.tight_layout()
 plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure1_static_cca_boxplots.png"))
@@ -44,19 +46,19 @@ logger.info("Saved static CCA boxplots.")
 # Figure 2: Time-resolved CCA Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x='stage', y='cca_corr1', data=subset_trajectories, ax=axs[0])
-axs[0].set_title('Time-Resolved CCA: cca_corr1')
+axs[0].set_title(r'Time-Resolved CCA: $\rho_1$')
 axs[0].set_ylabel("Correlation")
 axs[0].grid(alpha=0.3)
 axs[0].set_ylim(0,1)
-fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 sns.boxplot(x='stage', y='cca_corr2', data=subset_trajectories, ax=axs[1])
-axs[1].set_title('Time-Resolved CCA: cca_corr2')
+axs[1].set_title(r'Time-Resolved CCA: $\rho_2$')
 #axs[1].set_ylabel("Correlation")
 axs[1].grid(alpha=0.3)
 axs[1].set_ylim(0,1)
 axs[1].yaxis.set_visible(False)
-fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 plt.tight_layout()
 plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure2_time_resolved_boxplots.png"))
@@ -70,22 +72,22 @@ for stage in mean_cca_trajectory_by_stage['stage'].unique():
     axs[0].plot(data.index, data['cca_corr1'], label=stage)
     axs[1].plot(data.index, data['cca_corr2'], label=stage)
 
-axs[0].set_title("Mean Trajectory: cca_corr1")
+axs[0].set_title(r"Mean Trajectory: $\rho_1$")
 axs[0].set_xlabel("Time Bin Index")
 axs[0].set_ylabel("Correlation")
 #axs[0].legend()
 axs[0].grid(alpha=0.3)
 axs[0].set_ylim(0,1)
-fig.text(0.05, 0.9, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.05, 0.9, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
-axs[1].set_title("Mean Trajectory: cca_corr2")
+axs[1].set_title(r"Mean Trajectory: $\rho_2$")
 axs[1].set_xlabel("Time Bin Index")
 #axs[1].set_ylabel("Correlation")
 #axs[1].legend()
 axs[1].grid(alpha=0.3)
 axs[1].set_ylim(0,1)
 axs[1].yaxis.set_visible(False)
-fig.text(0.55, 0.9, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.55, 0.9, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 handles, labels = axs[0].get_legend_handles_labels()
 
@@ -107,19 +109,19 @@ logger.info("Saved mean CCA trajectories by stage.")
 # Figure 4: Entropy Boxplots
 fig, axs = plt.subplots(1, 2, figsize=(12, 5))
 sns.boxplot(x='stage', y='cca_corr1_compute_entropy', data=entropy_by_subject_stage, ax=axs[0])
-axs[0].set_title("Entropy: cca_corr1")
+axs[0].set_title(r"Entropy: $\rho_1$")
 axs[0].set_ylabel("Entropy")
 axs[0].grid(alpha=0.3)
 axs[0].set_ylim(0,3)
-fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.05, 0.95, 'Panel A', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 sns.boxplot(x='stage', y='cca_corr2_compute_entropy', data=entropy_by_subject_stage, ax=axs[1])
-axs[1].set_title("Entropy: cca_corr2")
+axs[1].set_title(r"Entropy: $\rho_2$")
 #axs[1].set_ylabel("Entropy")
 axs[1].grid(alpha=0.3)
 axs[1].set_ylim(0,3)
 axs[1].yaxis.set_visible(False)
-fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12)
+fig.text(0.55, 0.95, 'Panel B', ha='left', va='center', rotation='horizontal', fontsize=12, fontweight='bold')
 
 plt.tight_layout()
 plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure4_entropy_boxplots.png"))
