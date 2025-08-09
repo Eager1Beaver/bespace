@@ -1,11 +1,8 @@
 \documentclass[14pt]{article} % article
 \usepackage[utf8]{inputenc}
 \usepackage{listingsutf8}
-%\usepackage[T2A]{fontenc}
 \usepackage[english]{babel}
 \usepackage{amssymb,amsmath,amsfonts,amsbsy}
-%\usepackage{mathtext}
-%\usepackage{indentfirst}
 \usepackage{tabularx}
 \usepackage{booktabs}
 \usepackage{graphicx}
@@ -15,25 +12,11 @@
 \usepackage{cite}
 \usepackage{enumerate}
 \usepackage{enumitem}
-%%\usepackage[braket]{qcircuit}
 \usepackage{marvosym}
-\usepackage{multicol}
-\usepackage{comment}
 \usepackage{authblk}
-\usepackage{lipsum}
-%\usepackage{hyperref}
+\usepackage{float}
+\usepackage{placeins}
 \graphicspath{{figs/}}
-%\DeclareGraphicsExtensions{.pdf,.png,.jpg}
-%\bibliographystyle{utf8gost780u}
-%\usepackage{apacite}
-%\bibliographystyle{apacite}
-
-% Print line number page wisely 
-%\usepackage[pagewise]{lineno}
-%\linenumbers
-
-%\renewcommand\linenumberfont{\normalfont\bfseries\normal}
-%\renewcommand\linenumberfont{\normal}
 
 \title{\vspace{-2.5cm}\textbf{\Large{Exploring the Shared Low-Dimensional Subspace of EEG and EOG Signals in Sleep Stages}}}
 
@@ -48,28 +31,7 @@
 
 \usepackage[onehalfspacing]{setspace}
 
-\usepackage{listings}
-\renewcommand{\lstlistingname}{Listing}
-\lstset{language=Python,
-        numbers=left,
-        basicstyle=\small\ttfamily,
-        breaklines=true,
-        showstringspaces=false,
-        stepnumber=1,         
-        numbersep=5pt,          
-        showspaces=false,       
-        showtabs=false,         
-        %frame=single,          
-        tabsize=4,              
-        captionpos=b,           
-        breakatwhitespace=false,
-        escapeinside={\%*}{*)}, 
-        texcl=true
-        }
-
-%\usepackage[left=1cm, right=1cm, top=1cm, bottom=1cm]{geometry} % 2.5 1 1 2.5
 \usepackage[a4paper, margin=0.5in]{geometry}
-
 
 \usepackage[
     colorlinks=true,
@@ -87,13 +49,12 @@
 \makeatletter
 \renewcommand{\@biblabel}[1]{#1.}
 
-% ==== Layout & spacing tweaks for 5-page fit (no content change) ====
-% Slightly tighten section spacing
+% Layout
 \usepackage{titlesec}
 \titlespacing\section{0pt}{0.9\baselineskip}{0.45\baselineskip}
 \titlespacing\subsection{0pt}{0.7\baselineskip}{0.35\baselineskip}
 
-% Tighten floats and captions a bit
+% Tighten floats and captions
 \setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
 \setlength{\floatsep}{8pt plus 2pt minus 2pt}
 \setlength{\intextsep}{8pt plus 2pt minus 2pt}
@@ -101,7 +62,7 @@
 \setlength{\abovecaptionskip}{6pt}
 \setlength{\belowcaptionskip}{0pt}
 
-% Lift page numbers slightly for nicer footer white space
+% Lift page numbers
 \setlength{\footskip}{24pt}
 
 % Compact bibliography (reduce extra vertical gaps between items)
@@ -116,13 +77,6 @@
 \renewcommand{\endthebibliography}{\end{oldthebibliography}}
 \makeatother
 
-
-%%%%%%%%%%%%
-
-\usepackage{float}
-\usepackage{placeins}
-
-
 \setcounter{topnumber}{2}
 \setcounter{bottomnumber}{2}
 \setcounter{totalnumber}{4}
@@ -131,7 +85,6 @@
 \renewcommand{\textfraction}{0.07}
 \renewcommand{\floatpagefraction}{0.80}
 
-% ================================================================
 \makeatother
 
 \sloppy
@@ -146,3 +99,4 @@
 \renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.} 
 
 \setcounter{tocdepth}{1}
+%

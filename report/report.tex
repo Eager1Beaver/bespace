@@ -8,18 +8,7 @@
 % Abstract
 \section{Abstract}
 
-%\textbf{Background}\\
-EEG and EOG signals are fundamental components of sleep monitoring, yet their joint dynamics remain underexplored. While these modalities are often treated separately, recent evidence suggests overlapping signal content and potential interactions that reflect underlying neurophysiological coordination. Understanding how this coordination evolves across sleep stages may reveal new insights into brain-eye communication during sleep.
-\textbf{Aim}: To quantify how strongly EEG and EOG signals couple across human sleep stages.
-
-%\textbf{Methods}\\
-Overnight PSG from 29 adults were segmented into Wake, N1, N2, N3 and REM. Canonical correlation analysis (CCA) extracted the first two shared dimensions ($\rho_1$, $\rho_2$) in static stage-wise blocks and in 30 s sliding windows.
-
-%\textbf{Results}\\
-Stage-wise $\rho_1$ and $\rho_2$ increased from Wake to N3, with REM and N1 showing intermediate coupling. Time-resolved analysis confirmed greater strength and stability in deeper stages, while coupling entropy was highest in Wake and REM.
-
-%\textbf{Conclusion}\\
-EEG and EOG share a state-dependent low-dimensional subspace that is strongest in N3, high in N2, moderate in N1 and REM, and minimal in Wake. These findings refine our understanding of brain-eye interactions and support stage-aware sensing and analysis in sleep research.
+This study investigates the coupling between electroencephalography (EEG) and electrooculography (EOG) signals across sleep stages using Canonical Correlation Analysis (CCA). We applied both static and time-resolved CCA to preprocessed recordings from the APPLES dataset, quantifying the first and second canonical correlation coefficients ($\rho_1$, $\rho_2$) for each stage. Time-resolved analysis further characterized the temporal dynamics of EEG-EOG coupling via stage-specific mean trajectories and entropy measures. To assess the low-dimensionality and interpretability of the shared EEG-EOG subspace, we computed the proportion of explained variance captured by the first two canonical components. A substantial fraction of the cross-modal covariance was accounted for in this low-dimensional space. Our results show a consistent increase in $\rho_1$ with sleep depth and distinctive patterns in explained variance and entropy across stages, suggesting stage-specific mechanisms of ocular-cortical interaction. These findings demonstrate that CCA, complemented by explained variance analysis, provides a physiologically meaningful framework for characterizing EEG-EOG relationships in sleep.
 
 \textbf{Keywords: EEG, EOG, CCA}
 
@@ -27,7 +16,7 @@ EEG and EOG share a state-dependent low-dimensional subspace that is strongest i
 
 Sleep stages unfolds through non-rapid eye movement (NREM) sleep, comprising stages N1 to N3, and rapid-eye-movement (REM) sleep, classically scored with polysomnography that monitors electroencephalographic (EEG) activity and electrooculographic (EOG) signals related to eye movements~\cite{liu2021}. Growing evidence shows these two channels are not independent: ocular potentials contaminate frontal EEG, while EOG electrodes sample cortical rhythms, and exploiting this overlap improves automatic detection of REM and drowsiness~\cite{xu2025, safieddine2012}. Such findings imply that brain and eye signals cohabit a low-dimensional "communication subspace" whose geometry may vary with different state. Yet the strength and dynamics of this coupling across all stages remain unquantified.
 
-In this study, we seek to quantify this shared subspace across sleep stages by extracting the primary dimensions of joint EEG-EOG variance and systematically assessing how their correlation strength and stability vary as a function of sleep stages. We operationalize this coupling using canonical correlation analysis (CCA), allowing us to track not only average synchrony but also the variability and dimensional richness of shared activity across stages. Using the public Apnea Positive Pressure Long-term Efficacy Study (APPLES) overnight PSG dataset~\cite{mueller_nsrr}, we applied canonical correlation analysis (CCA) to EEG and EOG signals to extract dominant joint components and assess their coupling strength during wake, N1, N2, N3, and REM stages, testing the hypothesis that coupling peaks in REM and diminishes in deeper NREM sleep.
+In this study, we seek to quantify this shared subspace across sleep stages by extracting the primary dimensions of joint EEG-EOG variance and systematically assessing how their correlation strength and stability vary as a function of sleep stages. Using the public Apnea Positive Pressure Long-term Efficacy Study (APPLES) overnight PSG dataset~\cite{mueller_nsrr}, we applied canonical correlation analysis (CCA) to EEG and EOG signals to extract dominant joint components and assess their coupling strength during wake, N1, N2, N3, and REM stages, testing the hypothesis that coupling peaks in REM and diminishes in deeper NREM sleep.
  
 \section{Methods}
 
@@ -111,7 +100,7 @@ We also evaluated how much signal variance was captured by each canonical variat
 This study quantified the strength and dynamics of the shared EEG--EOG subspace across human sleep, using canonical correlation analysis (CCA) at two complementary scales: (i) a static, stage-wise summary and (ii) a time-resolved view with short sliding windows. Across both approaches, coupling increased with sleep depth and was most stable in N2/N3, whereas Wake and REM exhibited broader, more fluctuating distributions. Taken together, these patterns suggest that as cortical and oculomotor systems enter deeper non-REM sleep, their shared low-dimensional activity becomes more coherent and less variable.
 
 \textbf{Physiological interpretation.}
-Higher and more stable coupling in N2/N3 is consistent with reduced oculomotor activity, stronger large-scale cortical synchronization, and a relative quiescence of rapid eye movements. Conversely, greater spread in Wake and REM likely reflects mixtures of ocular events (e.g., saccades, blinks or REMs), arousal fluctuations, and heterogeneous cortical states. The prominence of a single dominant canonical dimension ($\rho_1$) with a smaller, yet present, second dimension ($\rho_2$) indicates that most of the shared variance concentrates in a compact subspace, with residual structure that varies by stage.
+Higher and more stable coupling in N2/N3 is consistent with reduced oculomotor activity, stronger large-scale cortical synchronization, and a relative quiescence of rapid eye movements. Conversely, greater spread in Wake and REM likely reflects mixtures of ocular events (e.g., saccades, blinks or REMs), arousal fluctuations, and heterogeneous cortical states. We observed that in most stages, a single dominant canonical dimension ($\rho_1$) is accompanied by a smaller second dimension ($\rho_2$). This pattern suggests that most of the shared variance lies in a low-dimensional subspace, with smaller residual structure that differs by stage
 
 \textbf{Temporal dynamics and dispersion.}
 Time-resolved trajectories showed that N2/N3 maintain elevated coupling with limited drift, while Wake and REM oscillate more strongly. The entropy analysis formalized this observation: coupling distributions were narrowest in N3 and broadest in Wake/REM. Entropy here complements correlation magnitudes by describing how \emph{concentrated} or \emph{diffuse} the coupling is within a stage, capturing variability beyond central tendency.
