@@ -35,23 +35,12 @@
 %\renewcommand\linenumberfont{\normalfont\bfseries\normal}
 %\renewcommand\linenumberfont{\normal}
 
-\title{\vspace{-2.5cm}\textbf{Exploring the Shared Low-Dimensional Subspace of EEG and EOG Signals in Sleep Stages}}
+\title{\vspace{-2.5cm}\textbf{\large{Exploring the Shared Low-Dimensional Subspace of EEG and EOG Signals in Sleep Stages}}}
 
-%\author[1]{Ilia Golub}
 \author[]{Ilia Golub}
-
-%\author[1]{Pratit Kandel}
-
-%\author[1]{Prosperity Oguama}
 \author[]{Xueqing Li}
 
-
-%\affil[1]{Gonda Multidisciplinary Brain Research Center, Bar-Ilan University, Ramat Gan, Israel}
 \affil[]{Gonda Multidisciplinary Brain Research Center, Bar-Ilan University, Ramat Gan, Israel}
-%\affil[4]{Institute of Natural Sciences and Mathematics, Ural Federal University, Ekaterinburg, Russia}
-%\affil[5]{Department of Cardiology, Clinical Sciences, Lund University, Lund, Sweden}
-%\affil[6]{Arrhythmia Clinic, Skane University Hospital, Lund, Sweden}
-%\affil[*]{Correspondence: golub.ilia.ilya@gmail.com}
 
 \setcounter{Maxaffil}{0}
 \renewcommand\Affilfont{\itshape\small}
@@ -87,7 +76,7 @@
     linkcolor=blue,
     filecolor=magenta,      
     urlcolor=cyan,
-    pdftitle={CW-2},
+    pdftitle={bespace_report},
     pdfauthor={Golub I},
     bookmarks=true,
     linktoc=all,
@@ -97,6 +86,52 @@
 
 \makeatletter
 \renewcommand{\@biblabel}[1]{#1.}
+
+% ==== Layout & spacing tweaks for 5-page fit (no content change) ====
+% Slightly tighten section spacing
+\usepackage{titlesec}
+\titlespacing\section{0pt}{0.9\baselineskip}{0.45\baselineskip}
+\titlespacing\subsection{0pt}{0.7\baselineskip}{0.35\baselineskip}
+
+% Tighten floats and captions a bit
+\setlength{\textfloatsep}{10pt plus 2pt minus 2pt}
+\setlength{\floatsep}{8pt plus 2pt minus 2pt}
+\setlength{\intextsep}{8pt plus 2pt minus 2pt}
+\captionsetup{skip=6pt}
+\setlength{\abovecaptionskip}{6pt}
+\setlength{\belowcaptionskip}{0pt}
+
+% Lift page numbers slightly for nicer footer white space
+\setlength{\footskip}{24pt}
+
+% Compact bibliography (reduce extra vertical gaps between items)
+\makeatletter
+\let\oldthebibliography\thebibliography
+\let\endoldthebibliography\endthebibliography
+\renewcommand{\thebibliography}[1]{%
+  \begin{oldthebibliography}{#1}%
+    \setlength{\parskip}{0pt}%
+    \setlength{\itemsep}{0pt plus 0.3ex}%
+}%
+\renewcommand{\endthebibliography}{\end{oldthebibliography}}
+\makeatother
+
+
+%%%%%%%%%%%%
+
+\usepackage{float}
+\usepackage{placeins}
+
+
+\setcounter{topnumber}{2}
+\setcounter{bottomnumber}{2}
+\setcounter{totalnumber}{4}
+\renewcommand{\topfraction}{0.9}
+\renewcommand{\bottomfraction}{0.8}
+\renewcommand{\textfraction}{0.07}
+\renewcommand{\floatpagefraction}{0.80}
+
+% ================================================================
 \makeatother
 
 \sloppy
@@ -109,13 +144,5 @@
 \renewcommand{\labelenumii}{\arabic{enumi}.\arabic{enumii}.}
 \renewcommand{\theenumiii}{\arabic{enumiii}.} 
 \renewcommand{\labelenumiii}{\arabic{enumi}.\arabic{enumii}.\arabic{enumiii}.} 
-
-
-\DeclareMathOperator{\rot}{rot}		% Определяем операции rot
-\DeclareMathOperator{\diverg}{div}	% div
-\DeclareMathOperator{\grad}{grad}	% grad
-\DeclareMathOperator{\arth}{Arth}    % arc tanh
-\DeclareMathOperator{\Ai}{Ai}
-\DeclareMathOperator{\Bi}{Bi}
 
 \setcounter{tocdepth}{1}
