@@ -1,19 +1,23 @@
-import os
-import pandas as pd
+# time_resolved_cca_check_stationarity.py
 from statsmodels.tsa.stattools import adfuller, kpss
+from config_loader import load_config
+from logger import logger
+import pandas as pd
+import os
 
-# Define the path to time-resolved CCA data
-data_folder = "data/time_resolved_cca"
+# Parameters
+config = load_config()
+
+DATA_FOLDER = config.time_cca_params.output_dir  # "data/time_resolved_cca"
+OUTPUT_PATH = os.path.join(DATA_FOLDER, "stationarity_results.csv")
 
 # List available CCA timeseries files
-cca_files = [f for f in os.listdir(data_folder) if f.endswith("_cca_timeseries.csv")]
+cca_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith("_cca_timeseries.csv")]
 
-# Load a few representative files (max 3)
-selected_files = cca_files[:]
 results = []
 
-for fname in selected_files:
-    df = pd.read_csv(os.path.join(data_folder, fname))
+for fname in cca_files:
+    df = pd.read_csv(os.path.join(DATA_FOLDER, fname))
     subject = fname.replace("_cca_timeseries.csv", "")
 
     for comp in ["cca_corr1", "cca_corr2"]:
@@ -41,8 +45,7 @@ for fname in selected_files:
         })
 
 results_df = pd.DataFrame(results)
+
 # Save results to CSV
-output_path = os.path.join(data_folder, "stationarity_results.csv")
-results_df.to_csv(output_path, index=False)
-print(f"Stationarity results saved to {output_path}")
-#print(results_df)
+results_df.to_csv(OUTPUT_PATH, index=False)
+logger.info(f"Stationarity results saved to {OUTPUT_PATH}")
