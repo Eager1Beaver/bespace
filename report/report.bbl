@@ -1,0 +1,33 @@
+\begin{thebibliography}{1}
+
+\bibitem{liu2021}
+G.-R. Liu, T.-Y. Lin, H.-T. Wu, Y.-C. Sheu, C.-L. Liu, W.-T. Liu, M.-C. Yang,
+  Y.-L. Ni, K.-T. Chou, C.-H. Chen, D.~Wu, C.-C. Lan, K.-L. Chiu, H.-Y. Chiu,
+  and Y.-L. Lo.
+\newblock Large-scale assessment of consistency in sleep stage scoring rules
+  among multiple sleep centers using an interpretable machine learning
+  algorithm.
+\newblock {\em Journal of Clinical Sleep Medicine}, 17(2):159--166, 2021.
+
+\bibitem{mueller_nsrr}
+R.~Mueller.
+\newblock Sleep data—national sleep research resource—nsrr.
+\newblock \url{https://doi.org/10.25822/63pr-a591}, n.d.
+\newblock Accessed from https://doi.org/10.25822/63pr-a591.
+
+\bibitem{safieddine2012}
+D.~Safieddine, A.~Kachenoura, L.~Albera, G.~Birot, A.~Karfoul, A.~Pasnicu,
+  A.~Biraben, F.~Wendling, L.~Senhadji, and I.~Merlet.
+\newblock Removal of muscle artifact from eeg data: Comparison between
+  stochastic (ica and cca) and deterministic (emd and wavelet-based)
+  approaches.
+\newblock {\em EURASIP Journal on Advances in Signal Processing}, 2012(1):127,
+  2012.
+
+\bibitem{xu2025}
+X.~Xu, B.~Zhang, T.~Xu, and J.~Tang.
+\newblock An effective and interpretable sleep stage classification approach
+  using multi-domain electroencephalogram and electrooculogram features.
+\newblock {\em Bioengineering}, 12(3):286, 2025.
+
+\end{thebibliography}
