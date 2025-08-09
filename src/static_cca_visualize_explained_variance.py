@@ -1,15 +1,19 @@
-import pandas as pd
+# static_cca_visualize_explained_variance.py
+from config_loader import load_config
 import matplotlib.pyplot as plt
+from logger import logger
 import seaborn as sns
+import pandas as pd
 import os
 
-# Re-define CSV path after kernel reset
-csv_path = "data/static_cca/explained_variance_by_stage.csv"
-df = pd.read_csv(csv_path)
+# Parameters
+config = load_config()
 
-# Create output folder
-output_folder = "report/figs"
-os.makedirs(output_folder, exist_ok=True)
+DATA_FOLDER = config.static_cca_params.output_dir  # "data/static_cca"
+CSV_PATH = os.path.join(DATA_FOLDER, "explained_variance_by_stage.csv")
+REPORT_FIGURES_FOLDER = config.report.figures_folder  # "report/figs"
+
+df = pd.read_csv(CSV_PATH)
 
 # Set plot style
 sns.set(style="whitegrid")
@@ -23,7 +27,7 @@ plt.xlabel("Sleep Stage")
 plt.legend(title="Component")
 plt.ylim(0, 1)
 plt.tight_layout()
-fig_xc_path = os.path.join(output_folder, "figure5a_explained_variance_Xc.png")
+fig_xc_path = os.path.join(REPORT_FIGURES_FOLDER, "figure5a_explained_variance_Xc.png")
 plt.savefig(fig_xc_path)
 plt.close()
 
@@ -36,7 +40,8 @@ plt.xlabel("Sleep Stage")
 plt.legend(title="Component")
 plt.ylim(0, 1)
 plt.tight_layout()
-fig_yc_path = os.path.join(output_folder, "figure5b_explained_variance_Yc.png")
+fig_yc_path = os.path.join(REPORT_FIGURES_FOLDER, "figure5b_explained_variance_Yc.png")
 plt.savefig(fig_yc_path)
 plt.close()
 
+logger.info(f"Saved explained variance plots to {REPORT_FIGURES_FOLDER}")
