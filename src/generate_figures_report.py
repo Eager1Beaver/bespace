@@ -7,8 +7,6 @@ import pandas as pd
 import os
 
 # Parameters
-#plt.rcParams['text.usetex'] = True  # Enable LaTeX rendering
-
 config = load_config()
 
 SUMMARY_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
