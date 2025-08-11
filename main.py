@@ -18,9 +18,8 @@ def run_script(script_name):
 
 
 def main():
-    # Load config using OmegaConf
-    config_path = "src/config/config.yaml"
-    config = load_config(config_path)
+    # Load config
+    config = load_config()
 
     # Step-by-step execution based on flags in run_params
     run_flags = config.run_params

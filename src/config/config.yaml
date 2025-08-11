@@ -1,8 +1,8 @@
 run_params:
-  run_static_cca: True
-  run_time_resolved_cca: True
-  run_static_analysis: True
-  run_time_resolved_analysis: True
+  run_static_cca: False
+  run_time_resolved_cca: False
+  run_static_analysis: False
+  run_time_resolved_analysis: False
   generate_figures: True
 
 data:
