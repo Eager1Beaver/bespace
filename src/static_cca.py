@@ -38,7 +38,7 @@ for edf_file, annot_file in file_pairs:
         raw = mne.io.read_raw_edf(edf_path, preload=True, verbose=False)
         sfreq = int(raw.info['sfreq'])
         start_datetime = raw.info['meas_date'].replace(tzinfo=None)
-        logger.info(f"EDF {edf_path} Start:", start_datetime)
+        #logger.info(f"EDF {edf_path} Start:", start_datetime)
 
         # Read annotations
         with open(annot_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -83,21 +83,21 @@ for edf_file, annot_file in file_pairs:
         # Organize EEG and EOG segments
         eeg_data = {stage: [] for stage in SLEEP_STAGES}
         eog_data = {stage: [] for stage in SLEEP_STAGES}
-        for s, start, stop in parsed_epochs:
+        for stage, start, stop in parsed_epochs:
             start_sample = round(start * sfreq)
             stop_sample = min(round(stop * sfreq), raw.n_times)
 
             if start_sample < 0 or start_sample >= stop_sample:
-                logger.warning(f"Invalid sample range for stage {s}: start={start_sample}, stop={stop_sample}, total={raw.n_times}")
+                logger.warning(f"Invalid sample range for stage {stage}: start={start_sample}, stop={stop_sample}, total={raw.n_times}")
                 continue
 
             try:
                 eeg = raw.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
                 eog = raw.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
-                eeg_data[s].append(eeg)
-                eog_data[s].append(eog)
+                eeg_data[stage].append(eeg)
+                eog_data[stage].append(eog)
             except Exception as e:
-                logger.error(f"Failed to extract data: stage={s}, start={start_sample}, stop={stop_sample}, error: {e}")
+                logger.error(f"Failed to extract data: stage={stage}, start={start_sample}, stop={stop_sample}, error: {e}")
                 continue
 
         # Set a downsampling factor
@@ -125,7 +125,7 @@ for edf_file, annot_file in file_pairs:
                 cca = CCA(n_components=2)
                 X_c, Y_c = cca.fit_transform(X, Y)
 
-                # ---- Save downsampled canonical projections ----
+                # Save downsampled projections
                 if len(X_c) > factor:
                     X_c_ds = X_c[::factor, :]
                     Y_c_ds = Y_c[::factor, :]
@@ -135,7 +135,6 @@ for edf_file, annot_file in file_pairs:
 
                 file_prefix = f"{edf_file.replace('.edf','')}_{stage}"
 
-                # Save downsampled projections
                 pd.DataFrame(X_c_ds, columns=["Xc_1", "Xc_2"]).to_csv(
                     os.path.join(OUTPUT_FOLDER, f"{file_prefix}_Xc_downsampled.csv"), index=False
                 )
@@ -144,14 +143,15 @@ for edf_file, annot_file in file_pairs:
                 )
 
                 # Compute canonical correlation coefficients
-                corr_coeffs = [np.corrcoef(X_c[:, i], Y_c[:, i])[0, 1] for i in range(X_c.shape[1])]
+                corr1 = np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1]
+                corr2 = np.corrcoef(X_c[:, 1], Y_c[:, 1])[0, 1]
                 
                 # Compute summary statistics
                 summary = {
                     "subject": edf_file,
                     "stage": stage,
-                    "cca_corr1": corr_coeffs[0],
-                    "cca_corr2": corr_coeffs[1] if len(corr_coeffs) > 1 else np.nan
+                    "cca_corr1": corr1,
+                    "cca_corr2": corr2
                 }
 
                 for idx in range(X_c.shape[1]):

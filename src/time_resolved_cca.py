@@ -21,6 +21,7 @@ WINDOW_LENGTH = config.time_cca_params.window_length # 30 seconds
 STEP_LENGTH = config.time_cca_params.step_length # 15 seconds
 fmt = "%H:%M:%S"
 
+# Iterate through .edf/.annot files
 file_pairs = [(f, f.replace(".edf", ".annot")) for f in os.listdir(DATA_FOLDER) if f.endswith(".edf")]
 
 for edf_file, annot_file in file_pairs:
@@ -56,6 +57,7 @@ for edf_file, annot_file in file_pairs:
                     start_time = datetime.combine(start_datetime.date(), start_clock)
                     stop_time = datetime.combine(start_datetime.date(), stop_clock)
 
+                    # Handle midnight crossing
                     if stop_time < start_time:
                         stop_time += timedelta(days=1)
                     if start_time < start_datetime:
@@ -69,6 +71,7 @@ for edf_file, annot_file in file_pairs:
                 except Exception as e:
                     logger.error(f"Annotation parse error: {e}")
 
+        # Perform time-resolved CCA
         stage_to_results = {stage: [] for stage in SLEEP_STAGES}
         for stage, start, stop in parsed_epochs:
             t = start
@@ -92,9 +95,12 @@ for edf_file, annot_file in file_pairs:
 
                     cca = CCA(n_components=2)
                     X_c, Y_c = cca.fit_transform(X, Y)
+
+                    # Compute canonical correlation coefficients
                     corr1 = np.corrcoef(X_c[:, 0], Y_c[:, 0])[0, 1]
                     corr2 = np.corrcoef(X_c[:, 1], Y_c[:, 1])[0, 1]
 
+                    # Compute summary statistics
                     stage_to_results[stage].append({
                         "time_sec": t,
                         "cca_corr1": corr1,
@@ -107,6 +113,7 @@ for edf_file, annot_file in file_pairs:
                     logger.error(f"CCA failed in {edf_file} stage {stage} at t={t}: {e}")
                 t += STEP_LENGTH
 
+            # Save results
             for stage, results in stage_to_results.items():
                 if results:
                     df_out = pd.DataFrame(results)

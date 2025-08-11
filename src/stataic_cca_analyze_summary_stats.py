@@ -45,7 +45,7 @@ for var in ["cca_corr1", "cca_corr2"]:
     else:
         logger.warning(f"Not enough groups for ANOVA on {var}")
 
-# Aggregate mean ± std for CCA correlations
+# Aggregate mean +- std for CCA correlations
 agg = summary_df.groupby("stage")[["cca_corr1", "cca_corr2"]].agg(["mean", "std", "count"])
 agg.columns = ['_'.join(col) for col in agg.columns]
 agg.reset_index(inplace=True)

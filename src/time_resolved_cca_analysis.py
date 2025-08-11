@@ -44,13 +44,14 @@ entropy_stats = (
         "cca_corr2": [compute_entropy, np.mean, np.std, skew, kurtosis]
     })
 )
+
 entropy_stats.columns = ['_'.join(col).strip() for col in entropy_stats.columns.values]
 entropy_stats.reset_index(inplace=True)
 entropy_stats_path = os.path.join(RESULTS_FOLDER, "entropy_by_subject_stage.csv")
 entropy_stats.to_csv(entropy_stats_path, index=False)
 logger.info(f"Entropy statistics saved to {entropy_stats_path}")
 
-# Function 4: Save a few representative trajectories (handpicked or automatic later)
+# Function 4: Save a few representative trajectories
 sampled_subjects = aggregated_data["subject"].drop_duplicates().sample(3, random_state=42).tolist()
 subset = aggregated_data[aggregated_data["subject"].isin(sampled_subjects)]
 subset_path = os.path.join(RESULTS_FOLDER, "subset_trajectories.csv")

@@ -21,14 +21,10 @@ pattern_Yc = os.path.join(OUTPUT_FOLDER, "*_Yc_downsampled.csv")
 
 # Projection loader
 def load_projection_files(pattern, prefix):
-    """
-    Loads all matching CSVs into long-form DataFrame.
-    """
     rows = []
     for filepath in glob.glob(pattern):
         filename = os.path.basename(filepath)
         
-        # Example filename: apples-170368_N1_Xc_downsampled.csv
         name_parts = filename.replace("_Xc_downsampled.csv", "") \
                              .replace("_Yc_downsampled.csv", "").split("_")
         
@@ -40,7 +36,7 @@ def load_projection_files(pattern, prefix):
 
         df = pd.read_csv(filepath)
 
-        # Convert wide → long
+        # Unpivoting the dataframe
         df_long = df.melt(var_name="projection", value_name="value")
         df_long["subject"] = subject
         df_long["stage"] = stage
@@ -64,7 +60,7 @@ if all_data.empty:
     logger.warning("No data loaded! Check file paths and patterns.")
     exit()
 
-# Save combined file for convenience
+# Save combined file
 all_data.to_csv(os.path.join(OUTPUT_FOLDER, "all_downsampled_projections.csv"), index=False)
 logger.info("Saved combined downsampled data.")
 

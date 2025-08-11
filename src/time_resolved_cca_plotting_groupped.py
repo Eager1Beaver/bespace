@@ -33,7 +33,6 @@ plt.savefig(os.path.join(FIGURES_FOLDER, "boxplot_cca_corr2_by_stage.png"))
 plt.close()
 logger.info("Saved boxplot of cca_corr2 by stage.")
 
-
 # 2. Lineplot of mean trajectories per stage over time
 plt.figure(figsize=(12, 6))
 for stage in mean_cca_trajectory_by_stage['stage'].unique():

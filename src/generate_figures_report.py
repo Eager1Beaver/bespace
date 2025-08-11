@@ -98,7 +98,6 @@ fig.legend(
     frameon=False
 )
 
-# Leave extra space at bottom for legend
 plt.tight_layout(rect=[0, 0, 1, 0.95])
 plt.savefig(os.path.join(REPORT_FIGURES_FOLDER, "figure3_cca_trajectories.png"))
 plt.close()

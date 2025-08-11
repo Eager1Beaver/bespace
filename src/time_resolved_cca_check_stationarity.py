@@ -11,7 +11,7 @@ config = load_config()
 DATA_FOLDER = config.time_cca_params.output_dir  # "data/time_resolved_cca"
 OUTPUT_PATH = os.path.join(DATA_FOLDER, "stationarity_results.csv")
 
-# List available CCA timeseries files
+# List CCA timeseries files
 cca_files = [f for f in os.listdir(DATA_FOLDER) if f.endswith("_cca_timeseries.csv")]
 
 results = []
