@@ -25,16 +25,21 @@ In this study, we seek to quantify this shared subspace across sleep stages by e
 Data for this study were drawn from 29 adult participants in the APPLES dataset. For each subject, we analyzed four bipolar EEG channels (C3-M2, C4-M1, O1-M2, O2-M1) alongside two EOG channels (LOC and ROC), with all recordings segmented according to the five sleep stages: Wake (W), N1, N2, N3 and REM (R).
 
 \subsection{Preprocessing}
+Preprocessing was carried out in MNE-Python by first loading the EEG and EOG channels from EDF recordings and importing the corresponding sleep stage annotations. Annotation timestamps were converted to seconds relative to each recording's start time to ensure precise alignment with the signal data, and segments with alignment issues were excluded or corrected. 
 
-Preprocessing was carried out in MNE-Python by first loading the EEG and EOG channels from EDF recordings and then importing the corresponding sleep stage annotations. We converted annotation timestamps to seconds relative to each recording's start time to ensure precise alignment with the signal data and excluded or corrected any segments with alignment issues. Finally, we extracted continuous EEG and EOG epochs for each labeled stage (W, N1, N2, N3, REM) to serve as inputs for our canonical correlation analyses.
+All signals were then subjected to standard filtering. EEG channels were bandpass filtered between 0.5-40~Hz, and EOG channels between 0.1-15~Hz, using zero-phase FIR filters. To reduce line noise, notch filters were applied at 50~Hz and its harmonics. These steps attenuated slow drifts, high-frequency noise, and powerline artifacts while preserving the relevant physiological activity. 
 
-\subsection{Dimensionality Reduction and Method Selection}
+Finally, continuous EEG and EOG epochs for each labeled sleep stage (W, N1, N2, N3, REM) were extracted and used as inputs for canonical correlation analyses. Figure~X illustrates an example 30~s segment of raw versus preprocessed signals, showing improved clarity and interpretability after filtering.
 
-We initially compared EEG and EOG subspaces using PCA and ICA followed by subspace angle computation, but both yielded near-zero or ill-defined angles, offering little physiological insight. 
+\subsection{Preliminary PCA and ICA Attempts}
+
+Before applying CCA, we explored whether simpler dimensionality-reduction methods could reveal EEG-EOG coupling. Principal Component Analysis (PCA) was applied to the joint EEG-EOG data, but the leading components mainly reflected overall EEG variance rather than cross-modal interactions. Independent Component Analysis (ICA) was also tested to identify statistically independent sources, yet the resulting components were difficult to interpret and did not reveal consistent coupling patterns across sleep stages. These preliminary analyses confirmed that neither PCA nor ICA was suitable for capturing the specific cross-modal correlations of interest, which motivated the adoption of CCA as the core method.
 
 \subsection{Static CCA Analysis (Per-Stage Aggregation)}
 
-We adopted Canonical Correlation Analysis (CCA) for its robustness and interpretability in capturing cross-modal dependence. After mean-cantering, a two-component CCA was applied. The first and second canonical correlations ($\rho_1$ and $\rho_2$) were obtained by correlating the paired canonical variates. To reduce serial dependence, the canonical time series were resampled at 1 Hz before computing stage-wise summary statistics.
+We adopted Canonical Correlation Analysis (CCA) for its robustness and interpretability in capturing cross-modal dependence. CCA is a multivariate statistical method that finds pairs of linear combinations (canonical variates) from two sets of variables such that the correlation between the paired combinations is maximized. In our case, the two sets are EEG and EOG signals. Given EEG data matrix $X$ and EOG data matrix $Y$, CCA finds weight vectors $a$ and $b$ that maximize the correlation $\rho = \mathrm{corr}(Xa, Yb)$. The first pair of canonical variates ($\rho_1$) captures the strongest shared component between EEG and EOG, while the second pair ($\rho_2$) captures the next strongest, orthogonal component. These canonical correlations serve as our primary measure of EEG-EOG coupling, with higher values indicating stronger shared dynamics between the two modalities.
+
+After mean-cantering, a two-component CCA was applied. The first and second canonical correlations ($\rho_1$ and $\rho_2$) were obtained by correlating the paired canonical variates. For static CCA, canonical projections were downsampled to 1~Hz solely to reduce file size (from $\sim$7.7~GB to $\sim$70~MB). This step was applied after CCA, and did not alter the results: explained variance values were nearly identical with and without downsampling (differences $<0.01$). %To reduce serial dependence, the canonical time series were resampled at 1 Hz before computing stage-wise summary statistics.
 
 To assess the representational compactness of EEG-EOG coupling, we computed the proportion of signal variance explained by each canonical variate. For each subject and sleep stage, we calculated the variance of the downsampled canonical projections ($X_c$, $Y_c$), and expressed each component's variance as a fraction of the total variance within that domain (EEG or EOG). This provided an estimate of how efficiently the CCA components capture the shared structure across modalities.
 
@@ -44,7 +49,7 @@ To characterize the temporal evolution of EEG–EOG coupling across sleep stages
 These values were analysed in three ways:
 \begin{itemize}
     \item Stage-wise aggregation: mean and dispersion of $\rho_1$ and $\rho_2$ across all windows within each stage.
-    \item Overnight trajectories:10-min bin averages to visualise stage-specific coupling trends across the recording.
+    \item Overnight trajectories: 10-min bin averages to visualise stage-specific coupling trends across the recording.
     \item Distributional complexity: per subject and stage, Shannon entropy, skewness, and kurtosis of the $\rho_1$/$\rho_2$ distributions to assess variability and deviation from normality.
 \end{itemize}
 
@@ -57,7 +62,6 @@ Statistical comparisons across sleep stages used one-way ANOVA implemented in Py
 \subsection{Static Canonical Correlation Analysis (CCA)}
 
 Stage-wise CCA on full-length segments showed a clear depth effect. The first canonical correlation ($\rho_1$) rose from 0.55 $\pm$ 0.14 in Wake to 0.86 $\pm$ 0.06 in N3; the second ($\rho_2$) increased from 0.32 $\pm$ 0.15 to 0.61 $\pm$ 0.09 (Fig.~\ref{fig:figure1}). One-way ANOVAs confirmed significance ($\rho_1$: F(4, 140)=24.4, p<0.001; $\rho_2$: F(4, 140)=16.7, p<0.001), indicating stronger EEG-EOG synchrony in deeper NREM sleep.%
-%
 \begin{figure}[!t]
 \centering
 \includegraphics[width=0.8\textwidth]{figure1_static_cca_boxplots.png}% % static_cca_analysis/cca_corr_by_stage.png
@@ -73,20 +77,18 @@ Local stationarity analysis confirmed that the majority of 30-second windows met
 \includegraphics[width=0.8\textwidth]{figure2_time_resolved_boxplots.png}% % static_cca_analysis/cca_corr_by_stage.png
 \caption{Time-resolved coupling distributions by stage. Using 30~s windows (15~s step) across the night, boxplots show the distributions of $\rho_1$ (Panel A) and $\rho_2$ (Panel B) within each stage. The same stage ordering appears as in the static analysis, with tighter, higher correlations in N2/N3 and broader, lower correlations in Wake and REM.}\label{fig:figure2}
 \end{figure}%
-\vspace{0pt}%
 
 \subsection{Distributional Complexity of Coupling Dynamics}
-\vspace{0pt}%
+
 Entropy was highest in Wake and REM and lowest in N3 (Fig.~\ref{fig:figure3}). Skewness (between -0.5 and 0.5) remained near zero, but kurtosis was elevated in Wake/REM, suggesting occasional extreme coupling events.%
 \begin{figure}[!t]
 \centering
 \includegraphics[width=0.8\textwidth]{figure3_cca_trajectories.png}% % static_cca_analysis/cca_corr_by_stage.png
 \caption{Mean coupling trajectories by stage. Stage-specific trajectories of the first (Panel A, $\rho_1$) and second (Panel B, $\rho_2$) canonical correlations averaged across subjects over time-bin indices (10~min bins). N2/N3 exhibit relatively flat, stable coupling plateaus, while Wake and REM show more pronounced temporal variability.}\label{fig:figure3}
 \end{figure}%
-\vspace{0pt}%
 
 \subsection{Projection Statistics and Downsampled Components}
-\vspace{0pt}%
+
 Mean and variance of the individual canonical projections showed no stage effect (all ANOVA p>0.17; Fig.~\ref{fig:figure4}). Thus, stage differences stem from correlation structure rather than projection amplitude.
 We also evaluated how much signal variance was captured by each canonical variate. On average, the first component explained 52-57\% of EEG variance and 52-63\% of EOG variance across sleep stages. In deeper stages such as N3, variance was more evenly distributed across components, while in REM and Wake, the first component dominated. These findings indicate a low-dimensional, structured coupling that varies with brain state.%
 \begin{figure}[!t]
@@ -94,9 +96,9 @@ We also evaluated how much signal variance was captured by each canonical variat
 \includegraphics[width=0.8\textwidth]{figure4_entropy_boxplots.png}%
 \caption{Within-stage dispersion (entropy) of time-resolved coupling. Subject-level Shannon entropy of $\rho_1$ (Panel A) and $\rho_2$ (Panel B) distributions computed within each stage. Entropy is lowest in N3 and highest in Wake and REM, indicating narrower and broader coupling distributions, respectively. One value per subject and stage.}\label{fig:figure4}
 \end{figure}%
-\vspace{0pt}%
 
 \section{Discussion}
+
 This study quantified the strength and dynamics of the shared EEG--EOG subspace across human sleep, using canonical correlation analysis (CCA) at two complementary scales: (i) a static, stage-wise summary and (ii) a time-resolved view with short sliding windows. Across both approaches, coupling increased with sleep depth and was most stable in N2/N3, whereas Wake and REM exhibited broader, more fluctuating distributions. Taken together, these patterns suggest that as cortical and oculomotor systems enter deeper non-REM sleep, their shared low-dimensional activity becomes more coherent and less variable.
 
 \textbf{Physiological interpretation.}

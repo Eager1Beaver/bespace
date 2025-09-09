@@ -1,5 +1,11 @@
 \begin{thebibliography}{1}
 
+\bibitem{hobson2010}
+J.~A. Hobson.
+\newblock Sleeping, waking, and dreaming.
+\newblock In {\em Encyclopedia of Behavioral Neuroscience}, pages 237--256.
+  Elsevier, 2010.
+
 \bibitem{liu2021}
 G.-R. Liu, T.-Y. Lin, H.-T. Wu, Y.-C. Sheu, C.-L. Liu, W.-T. Liu, M.-C. Yang,
   Y.-L. Ni, K.-T. Chou, C.-H. Chen, D.~Wu, C.-C. Lan, K.-L. Chiu, H.-Y. Chiu,
@@ -8,6 +14,13 @@ G.-R. Liu, T.-Y. Lin, H.-T. Wu, Y.-C. Sheu, C.-L. Liu, W.-T. Liu, M.-C. Yang,
   among multiple sleep centers using an interpretable machine learning
   algorithm.
 \newblock {\em Journal of Clinical Sleep Medicine}, 17(2):159--166, 2021.
+
+\bibitem{mccarley1994}
+R.~W. McCarley.
+\newblock Neurophysiology of sleep: Basic mechanisms underlying control of
+  wakefulness and sleep.
+\newblock In S.~Chokroverty, editor, {\em Sleep Disorders Medicine}, pages
+  17--36. Butterworth-Heinemann, 1994.
 
 \bibitem{mueller_nsrr}
 R.~Mueller.
