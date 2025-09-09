@@ -12,6 +12,9 @@ config = load_config()
 RESULTS_FOLDER = config.time_cca_params.results_dir  # "data/time_resolved_cca_analysis"
 FIGURES_FOLDER = os.path.join(RESULTS_FOLDER, "figures")
 
+if not os.path.exists(FIGURES_FOLDER):
+    os.makedirs(FIGURES_FOLDER)
+
 # Load the files
 stagewise_summary = pd.read_csv(os.path.join(RESULTS_FOLDER, "stagewise_summary.csv"))
 mean_cca_trajectory_by_stage = pd.read_csv(os.path.join(RESULTS_FOLDER, "mean_cca_trajectory_by_stage.csv"))

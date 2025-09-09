@@ -1,4 +1,5 @@
 # time_resolved_cca.py
+from preprocessing import apply_preprocessing
 from sklearn.cross_decomposition import CCA
 from datetime import datetime, timedelta
 from config_loader import load_config
@@ -21,6 +22,9 @@ WINDOW_LENGTH = config.time_cca_params.window_length # 30 seconds
 STEP_LENGTH = config.time_cca_params.step_length # 15 seconds
 fmt = "%H:%M:%S"
 
+if not os.path.exists(OUTPUT_FOLDER):
+    os.makedirs(OUTPUT_FOLDER)
+
 # Iterate through .edf/.annot files
 file_pairs = [(f, f.replace(".edf", ".annot")) for f in os.listdir(DATA_FOLDER) if f.endswith(".edf")]
 
@@ -36,6 +40,12 @@ for edf_file, annot_file in file_pairs:
         sfreq = int(raw.info['sfreq'])
         start_datetime = raw.info['meas_date'].replace(tzinfo=None)
         logger.info(f"EDF {edf_path} Start:", start_datetime)
+
+        try:
+            # Optional preprocessing (EEG/EOG only)
+            raw_proc = apply_preprocessing(raw, EEG_CHANNELS, EOG_CHANNELS, config)
+        except Exception as e:
+            logger.error(f"Failed to preprocess data for subject {edf_file} , error: {e}")
 
         # Read annotations
         with open(annot_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -81,11 +91,11 @@ for edf_file, annot_file in file_pairs:
 
                 if start_sample < 0 or stop_sample > raw.n_times:
                     t += STEP_LENGTH
-                    continue
+                    continue    
 
                 try:
-                    eeg = raw.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
-                    eog = raw.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
+                    eeg = raw_proc.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
+                    eog = raw_proc.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
                     X = eeg.T
                     Y = eog.T
 
@@ -125,7 +135,7 @@ for edf_file, annot_file in file_pairs:
         logger.error(f"Failed on {edf_file}: {e}")
 
     finally:
-        raw._data = None  # Detach memory-mapped data if present
-        raw.annotations.delete(0, len(raw.annotations))  # Clear MNE annotations    
-        del raw
+        raw_proc._data = None  # Detach memory-mapped data if present
+        raw_proc.set_annotations(None)  # Clear MNE annotations    
+        del raw_proc
         gc.collect() # Clean up memory

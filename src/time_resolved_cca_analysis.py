@@ -13,6 +13,9 @@ config = load_config()
 OUTPUT_FOLDER = config.time_cca_params.output_dir  # "data/time_resolved_cca"
 RESULTS_FOLDER = config.time_cca_params.results_dir  # "data/time_resolved_cca_analysis"
 
+if not os.path.exists(RESULTS_FOLDER):
+    os.makedirs(RESULTS_FOLDER)
+
 # Load all *_cca_timeseries.csv files
 all_files = glob(os.path.join(OUTPUT_FOLDER, "*_cca_timeseries.csv"))
 aggregated_data = pd.concat([pd.read_csv(f) for f in all_files], ignore_index=True)
