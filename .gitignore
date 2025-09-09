@@ -4,8 +4,9 @@
 /data/extras
 /data/static_cca/*_downsampled.csv
 /data/static_cca/all_downsampled_projections.csv
+/data/static_cca_analysis/figures
 /data/time_resolved_cca/*_timeseries.csv
-/src/test_notebook.ipynb
+/data/time_resolved_cca_analysis/figures
 /report/report.bbl
 /report/figs/run*
 /src/__pycache__
