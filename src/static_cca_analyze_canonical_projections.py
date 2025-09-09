@@ -9,11 +9,16 @@ import numpy as np
 import glob
 import os
 
+# TODO: plot are not necessary - remove
+
 # Parameters
 config = load_config()
 
 OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
 RESULTS_FOLDER = config.static_cca_params.results_dir # "data/static_cca_analysis"
+
+if not os.path.exists(RESULTS_FOLDER):
+    os.makedirs(RESULTS_FOLDER)
 
 # File patterns
 pattern_Xc = os.path.join(OUTPUT_FOLDER, "*_Xc_downsampled.csv")
@@ -61,8 +66,8 @@ if all_data.empty:
     exit()
 
 # Save combined file
-all_data.to_csv(os.path.join(OUTPUT_FOLDER, "all_downsampled_projections.csv"), index=False)
-logger.info("Saved combined downsampled data.")
+#all_data.to_csv(os.path.join(OUTPUT_FOLDER, "all_downsampled_projections.csv"), index=False)
+#logger.info("Saved combined downsampled data.")
 
 # Plot distributions per stage and projection
 for proj_type in ["Xc", "Yc"]:

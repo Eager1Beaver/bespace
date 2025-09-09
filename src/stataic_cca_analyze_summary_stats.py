@@ -13,6 +13,9 @@ config = load_config()
 OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
 RESULTS_FOLDER = config.static_cca_params.results_dir # "data/static_cca_analysis"
 
+if not os.path.exists(RESULTS_FOLDER):
+    os.makedirs(RESULTS_FOLDER)
+
 # Load summary CSV
 summary_path = os.path.join(OUTPUT_FOLDER, "eeg_eog_cca_summary_stats.csv")
 summary_df = pd.read_csv(summary_path)

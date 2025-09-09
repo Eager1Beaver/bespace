@@ -1,4 +1,5 @@
 # static_cca.py
+from preprocessing import apply_preprocessing
 from sklearn.cross_decomposition import CCA
 from datetime import datetime, timedelta
 from config_loader import load_config
@@ -21,6 +22,9 @@ SLEEP_STAGES = config.data.sleep_stages # ['W', 'N1', 'N2', 'N3', 'R']
 DOWNSAMPLING_FACTOR = config.static_cca_params.downsampling_factor # 1
 fmt = "%H:%M:%S"
 
+if not os.path.exists(OUTPUT_FOLDER):
+    os.makedirs(OUTPUT_FOLDER)
+
 # Initialize results list
 summary_results = []
 
@@ -39,6 +43,12 @@ for edf_file, annot_file in file_pairs:
         sfreq = int(raw.info['sfreq'])
         start_datetime = raw.info['meas_date'].replace(tzinfo=None)
         #logger.info(f"EDF {edf_path} Start:", start_datetime)
+
+        try:
+            # Optional preprocessing (EEG/EOG only)
+            raw_proc = apply_preprocessing(raw, EEG_CHANNELS, EOG_CHANNELS, config)
+        except Exception as e:
+            logger.error(f"Failed to preprocess data for subject {edf_file} , error: {e}") 
 
         # Read annotations
         with open(annot_path, "r", encoding="utf-8", errors="ignore") as f:
@@ -85,15 +95,15 @@ for edf_file, annot_file in file_pairs:
         eog_data = {stage: [] for stage in SLEEP_STAGES}
         for stage, start, stop in parsed_epochs:
             start_sample = round(start * sfreq)
-            stop_sample = min(round(stop * sfreq), raw.n_times)
+            stop_sample = min(round(stop * sfreq), raw_proc.n_times)
 
             if start_sample < 0 or start_sample >= stop_sample:
-                logger.warning(f"Invalid sample range for stage {stage}: start={start_sample}, stop={stop_sample}, total={raw.n_times}")
-                continue
+                logger.warning(f"Invalid sample range for stage {stage}: start={start_sample}, stop={stop_sample}, total={raw_proc.n_times}")
+                continue   
 
             try:
-                eeg = raw.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
-                eog = raw.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
+                eeg = raw_proc.get_data(picks=EEG_CHANNELS, start=start_sample, stop=stop_sample)
+                eog = raw_proc.get_data(picks=EOG_CHANNELS, start=start_sample, stop=stop_sample)
                 eeg_data[stage].append(eeg)
                 eog_data[stage].append(eog)
             except Exception as e:
@@ -178,9 +188,9 @@ for edf_file, annot_file in file_pairs:
     except Exception as e:
         logger.error(f"Failed on {edf_file}: {e}")
     #
-        raw._data = None  # Detach memory-mapped data if present
-        raw.annotations.delete(0, len(raw.annotations))  # Clear MNE annotations    
-        del raw, eeg_data, eog_data
+        raw_proc._data = None  # Detach memory-mapped data if present
+        raw_proc.annotations.delete(0, len(raw_proc.annotations))  # Clear MNE annotations    
+        del raw_proc, eeg_data, eog_data
         gc.collect() # Clean up memory
 
 # Save results

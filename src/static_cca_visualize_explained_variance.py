@@ -13,6 +13,9 @@ DATA_FOLDER = config.static_cca_params.output_dir  # "data/static_cca"
 CSV_PATH = os.path.join(DATA_FOLDER, "explained_variance_by_stage.csv")
 REPORT_FIGURES_FOLDER = config.report.figures_folder  # "report/figs"
 
+if not os.path.exists(REPORT_FIGURES_FOLDER):
+    os.makedirs(REPORT_FIGURES_FOLDER)
+
 df = pd.read_csv(CSV_PATH)
 
 # Set plot style
