@@ -1,15 +1,26 @@
 run_params:
-  run_static_cca: False
+  run_static_cca: True
   run_time_resolved_cca: False
   run_static_analysis: False
   run_time_resolved_analysis: False
-  generate_figures: True
+  generate_figures: False
 
 data:
   data_dir: "data/apples"
   eeg_channels: ['C3_M2', 'C4_M1', 'O1_M2', 'O2_M1']
   eog_channels: ['LOC', 'ROC']
   sleep_stages: ['W', 'N1', 'N2', 'N3', 'R']
+
+preprocess:
+  output_dir: "data/apples/preproc_examples"
+  enabled: True
+  line_hz: 60            
+  eeg:
+    hp: 0.3               # Hz
+    lp: 35.0              # Hz
+  eog:
+    hp: 0.1               # Hz
+    lp: 10.0              # Hz
 
 static_cca_params:
   downsampling_factor: 1
