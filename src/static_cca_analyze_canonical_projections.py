@@ -16,6 +16,10 @@ config = load_config()
 
 OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
 RESULTS_FOLDER = config.static_cca_params.results_dir # "data/static_cca_analysis"
+FIGURES_FOLDER = os.path.join(RESULTS_FOLDER, "figures")
+
+if not os.path.exists(FIGURES_FOLDER):
+    os.makedirs(FIGURES_FOLDER)
 
 if not os.path.exists(RESULTS_FOLDER):
     os.makedirs(RESULTS_FOLDER)
@@ -69,53 +73,6 @@ if all_data.empty:
 #all_data.to_csv(os.path.join(OUTPUT_FOLDER, "all_downsampled_projections.csv"), index=False)
 #logger.info("Saved combined downsampled data.")
 
-# Plot distributions per stage and projection
-for proj_type in ["Xc", "Yc"]:
-    for comp in ["1", "2"]:
-        projection_name = f"{proj_type}_{comp}"
-
-        df_plot = all_data[
-            (all_data["type"] == proj_type) &
-            (all_data["projection"] == projection_name)
-        ]
-
-        if df_plot.empty:
-            logger.warning(f"No data for {projection_name}")
-            continue
-
-        # KDE Plot
-        plt.figure(figsize=(10,5))
-        sns.kdeplot(
-            data=df_plot,
-            x="value",
-            hue="stage",
-            common_norm=False,
-            fill=True,
-            alpha=0.3,
-            linewidth=1.5
-        )
-        plt.title(f"Density of {projection_name} across stages")
-        plt.grid(alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(RESULTS_FOLDER, f"{projection_name}_kde.png"))
-        plt.close()
-        logger.info(f"Saved density plot for {projection_name}")
-
-        # Boxplot
-        plt.figure(figsize=(8,5))
-        sns.boxplot(
-            x="stage",
-            y="value",
-            data=df_plot,
-            showmeans=True
-        )
-        plt.title(f"Boxplot of {projection_name} across stages")
-        plt.grid(alpha=0.3)
-        plt.tight_layout()
-        plt.savefig(os.path.join(RESULTS_FOLDER, f"{projection_name}_boxplot.png"))
-        plt.close()
-        logger.info(f"Saved boxplot for {projection_name}")
-
 # Compute summary statistics by stage and projection
 summary_rows = []
 for proj_type in ["Xc", "Yc"]:
@@ -160,3 +117,52 @@ for proj_type in ["Xc", "Yc"]:
         if len(groups) > 1:
             fval, pval = f_oneway(*groups)
             logger.info(f"ANOVA for {projection_name}: F = {fval:.3f}, p = {pval:.3e}")
+
+# TODO: deprecate below
+# Plot distributions per stage and projection
+for proj_type in ["Xc", "Yc"]:
+    for comp in ["1", "2"]:
+        projection_name = f"{proj_type}_{comp}"
+
+        df_plot = all_data[
+            (all_data["type"] == proj_type) &
+            (all_data["projection"] == projection_name)
+        ]
+
+        if df_plot.empty:
+            logger.warning(f"No data for {projection_name}")
+            continue
+
+        # KDE Plot
+        plt.figure(figsize=(10,5))
+        sns.kdeplot(
+            data=df_plot,
+            x="value",
+            hue="stage",
+            common_norm=False,
+            fill=True,
+            alpha=0.3,
+            linewidth=1.5
+        )
+        plt.title(f"Density of {projection_name} across stages")
+        plt.grid(alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(os.path.join(FIGURES_FOLDER, f"{projection_name}_kde.png"))
+        plt.close()
+        logger.info(f"Saved density plot for {projection_name}")
+
+        # Boxplot
+        plt.figure(figsize=(8,5))
+        sns.boxplot(
+            x="stage",
+            y="value",
+            data=df_plot,
+            showmeans=True
+        )
+        plt.title(f"Boxplot of {projection_name} across stages")
+        plt.grid(alpha=0.3)
+        plt.tight_layout()
+        plt.savefig(os.path.join(FIGURES_FOLDER, f"{projection_name}_boxplot.png"))
+        plt.close()
+        logger.info(f"Saved boxplot for {projection_name}")
+        

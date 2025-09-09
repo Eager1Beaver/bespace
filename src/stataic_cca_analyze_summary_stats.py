@@ -12,9 +12,13 @@ config = load_config()
 
 OUTPUT_FOLDER = config.static_cca_params.output_dir # "data/static_cca"
 RESULTS_FOLDER = config.static_cca_params.results_dir # "data/static_cca_analysis"
+FIGURES_FOLDER = os.path.join(RESULTS_FOLDER, "figures")
 
 if not os.path.exists(RESULTS_FOLDER):
     os.makedirs(RESULTS_FOLDER)
+
+if not os.path.exists(FIGURES_FOLDER):
+    os.makedirs(FIGURES_FOLDER)
 
 # Load summary CSV
 summary_path = os.path.join(OUTPUT_FOLDER, "eeg_eog_cca_summary_stats.csv")
@@ -30,7 +34,7 @@ for var in ["cca_corr1", "cca_corr2"]:
     plt.ylabel(var)
     plt.grid(alpha=0.3)
     plt.tight_layout()
-    plot_path = os.path.join(RESULTS_FOLDER, f"{var}_boxplot_by_stage.png")
+    plot_path = os.path.join(FIGURES_FOLDER, f"{var}_boxplot_by_stage.png")
     plt.savefig(plot_path)
     plt.close()
     logger.info(f"Saved boxplot for {var}")
@@ -55,6 +59,7 @@ agg.reset_index(inplace=True)
 agg.to_csv(os.path.join(RESULTS_FOLDER, "cca_correlation_summary.csv"), index=False)
 logger.info("Saved aggregated summary CSV for cca_corr1 and cca_corr2.")
 
+# TODO: deprecate below
 # Analyze canonical projection means
 projection_cols = [c for c in summary_df.columns if ("Xc" in c or "Yc" in c) and "_mean" in c]
 
@@ -65,7 +70,7 @@ for var in projection_cols:
     plt.ylabel(var)
     plt.grid(alpha=0.3)
     plt.tight_layout()
-    plot_path = os.path.join(RESULTS_FOLDER, f"{var}_boxplot_by_stage.png")
+    plot_path = os.path.join(FIGURES_FOLDER, f"{var}_boxplot_by_stage.png")
     plt.savefig(plot_path)
     plt.close()
     logger.info(f"Saved boxplot for {var}")
