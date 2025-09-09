@@ -1,4 +1,5 @@
 run_params:
+  run_preproc_example: False
   run_static_cca: True
   run_time_resolved_cca: False
   run_static_analysis: False
@@ -30,6 +31,8 @@ static_cca_params:
 time_cca_params:
   window_length: 30
   step_length: 15
+  trajectory_bins: 600
+  entropy_bins: 20
   output_dir: "data/time_resolved_cca"
   results_dir: "data/time_resolved_cca_analysis"
 

@@ -12,6 +12,8 @@ config = load_config()
 
 OUTPUT_FOLDER = config.time_cca_params.output_dir  # "data/time_resolved_cca"
 RESULTS_FOLDER = config.time_cca_params.results_dir  # "data/time_resolved_cca_analysis"
+TRAJECTORY_BINS = config.time_cca_params.trajectory_bins # 600 
+ENTROPY_BINS = config.time_cca_params.entropy_bins # 20 
 
 if not os.path.exists(RESULTS_FOLDER):
     os.makedirs(RESULTS_FOLDER)
@@ -29,7 +31,7 @@ stagewise_stats.to_csv(stagewise_stats_path, index=False)
 logger.info(f"Stagewise summary saved to {stagewise_stats_path}")
 
 # Function 2: Compute temporal mean trajectories (binned over time)
-aggregated_data["time_bin"] = pd.cut(aggregated_data["time_sec"], bins=np.arange(0, aggregated_data["time_sec"].max() + 600, 600))
+aggregated_data["time_bin"] = pd.cut(aggregated_data["time_sec"], bins=np.arange(0, aggregated_data["time_sec"].max() + TRAJECTORY_BINS, TRAJECTORY_BINS))
 trajectory = aggregated_data.groupby(["stage", "time_bin"])[["cca_corr1", "cca_corr2"]].mean().reset_index()
 trajectory_path = os.path.join(RESULTS_FOLDER, "mean_cca_trajectory_by_stage.csv")
 trajectory.to_csv(trajectory_path, index=False)
@@ -37,7 +39,7 @@ logger.info(f"Temporal mean trajectories saved to {trajectory_path}")
 
 # Function 3: Compute subjectwise entropy of CCA1 and CCA2 per stage
 def compute_entropy(x):
-    hist, _ = np.histogram(x, bins=20, range=(0, 1), density=True)
+    hist, _ = np.histogram(x, bins=ENTROPY_BINS, range=(0, 1), density=True)
     return entropy(hist + 1e-12)  # add small value to avoid log(0)
 
 entropy_stats = (
