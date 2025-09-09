@@ -20,35 +20,43 @@ bespace/
 ├── requirements.txt
 ├── bespace.code-workspace
 │
-├── data/                            
-│   └── ...                          # Contains EDFs, annotations, outputs (excluded from git)
+├── data/
+│ ├── preproc_examples/ # CSV comparisons (before/after preprocessing)
+│ ├── static_cca/ # Stage-wise summary stats + explained variance
+│ ├── static_cca_analysis/ # Canonical projection stats + correlation summaries
+│ ├── time_resolved_cca/ # Time-resolved outputs + stationarity results
+│ └── time_resolved_cca_analysis/ # Aggregated trajectories, entropy, stagewise summaries
 │
 ├── report/
-│   ├── figs/                        # Contains final figures (.png)
-│   ├── report.tex                   # LaTeX report source
-│   ├── preamble.tex                 # LaTeX preamble
-│   ├── report.bib                   # Bibliography file
-│   └── report.pdf                   # Final compiled report
+│ ├── figs/ # Final figures (.png)
+│ ├── report.tex # LaTeX source
+│ ├── preamble.tex # LaTeX preamble
+│ ├── report.bib # Bibliography
+│ └── report.pdf # Compiled final report
 │
 └── src/
-    ├── config/
-    │   └── config.yaml              # All runtime settings and parameters
-    │
-    ├── config_loader.py             # Loads config.yaml using OmegaConf
-    ├── logger.py                    # Logging configuration
-    │
-    ├── static_cca.py                                 # Static CCA per stage
-    ├── static_cca_analyze_summary_stats.py           # Stats: boxplots, ANOVA
-    ├── static_cca_analyze_canonical_projections.py   # Xc/Yc KDEs and stats
-    ├── static_cca_explained_variance.py              # Explained variance computation
-    ├── static_cca_visualize_explained_variance.py    # Explained variance visualization
-    │
-    ├── time_resolved_cca.py                          # Time-windowed CCA
-    ├── time_resolved_cca_analysis.py                 # Stats, entropy, trajectories
-    ├── time_resolved_cca_plotting_groupped.py        # Visualization per theme
-    ├── time_resolved_cca_check_stationarity.py       # Stationarity checks
-    │
-    └── generate_figures_report.py                    # Final multi-panel figures
+├── config/
+│ └── config.yaml # Runtime settings and parameters
+│
+├── config_loader.py # Loads config via OmegaConf
+├── logger.py # Logging configuration
+│
+├── preprocessing.py # Preprocessing functions (filtering, notch, etc.)
+├── export_preproc_examples.py # Export before/after preprocessing CSVs
+├── visualize_preproc_examples.py # Plot preprocessing examples
+│
+├── static_cca.py # Static CCA per stage
+├── static_cca_analyze_summary_stats.py # Stats: boxplots, ANOVA
+├── static_cca_analyze_canonical_projections.py # Projection KDEs and stats
+├── static_cca_explained_variance.py # Explained variance computation
+├── static_cca_visualize_explained_variance.py # Explained variance visualization
+│
+├── time_resolved_cca.py # Sliding-window CCA
+├── time_resolved_cca_analysis.py # Stats, entropy, trajectories
+├── time_resolved_cca_plotting_grouped.py # Visualization by stage/theme
+├── time_resolved_cca_check_stationarity.py # ADF/KPSS stationarity checks
+│
+└── generate_figures_report.py # Final multi-panel figures
 
 ```
 
@@ -84,18 +92,19 @@ src/config/config.yaml
 Edit the YAML file to enable or disable pipeline steps:
 ```yaml
 run_params:
-  run_static_cca: true
-  run_time_resolved_cca: true
-  run_static_analysis: true
-  run_time_resolved_analysis: true
-  generate_figures: true
+  run_preproc_example: False
+  run_static_cca: True
+  run_time_resolved_cca: False
+  run_static_analysis: False
+  run_time_resolved_analysis: False
+  generate_figures: False
 ```
 
 You can also set:
 - EEG/EOG channel names
 - Input/output directories
+- Preprocessing parameters (line noise, bandpass)
 - Window and step sizes for time-resolved CCA
-- Binning for trajectories
 
 ---
 
@@ -123,7 +132,7 @@ python main.py
 - `data/static_cca/explained_variance_by_stage.csv` — fraction of EEG/EOG variance captured by each CCA component.
 - `data/time_resolved_cca_analysis/stationarity_results.csv` — ADF/KPSS pass/fail rates per window (if enabled).
 
-**Figures (publication‑ready)**
+**Figures**
 - `report/figs/figure1_static_cca_boxplots.png` — static ρ₁/ρ₂ by stage.
 - `report/figs/figure2_time_resolved_boxplots.png` — time‑resolved ρ₁/ρ₂ distributions by stage.
 - `report/figs/figure3_cca_trajectories.png` — 10‑min mean trajectories by stage.
