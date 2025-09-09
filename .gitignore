@@ -1,6 +1,13 @@
 /bespace
 /data/apples
 /data/depr
+/data/extras
 /data/static_cca/*_downsampled.csv
 /data/static_cca/all_downsampled_projections.csv
 /data/time_resolved_cca/*_timeseries.csv
+/src/test_notebook.ipynb
+/report/report.bbl
+/report/figs/run*
+/src/__pycache__
+main.log
+python.log
